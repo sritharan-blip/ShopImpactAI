@@ -38,6 +38,9 @@ button[data-testid="stBaseButton-primary"],button[data-testid="stBaseButton-prim
 button[data-testid="stBaseButton-primary"] *,button[data-testid="stBaseButton-primaryFormSubmit"] * {
   color:var(--si-accent-text)!important
 }
+/* Switch paired foreground/background colors together to keep labels readable. */
+button[data-testid="stBaseButton-primary"],button[data-testid="stBaseButton-primaryFormSubmit"],
+.st-key-appearance button {transition:transform .18s ease,box-shadow .2s ease!important}
 button:disabled {opacity:.45;cursor:not-allowed}
 [data-testid="stMetric"] {position:relative;overflow:hidden;border:1px solid var(--si-border);background:var(--si-surface);
   border-radius:18px;padding:1.1rem 1.2rem;box-shadow:var(--si-shadow);animation:si-rise .45s ease both}
@@ -58,6 +61,7 @@ input::placeholder,textarea::placeholder {color:var(--si-muted)!important;opacit
 [data-baseweb="select"] svg,[data-testid="stExpander"] svg,[data-testid="stSidebar"] svg {fill:currentColor;color:var(--si-muted)}
 [data-testid="stSelectbox"] [role="combobox"],[data-testid="stMultiSelect"] [role="combobox"],
 [data-testid="stDateInput"] input,[data-testid="stDateInput"] button,
+[data-testid="stDateInputField"],
 [data-testid="stDateInput"] div:has(> input) {
   background:var(--si-inset)!important;color:var(--si-text)!important;border-color:var(--si-border)!important
 }
@@ -93,6 +97,7 @@ input::placeholder,textarea::placeholder {color:var(--si-muted)!important;opacit
 [data-testid="stProgress"] [role="progressbar"] > div {background:var(--si-inset)!important}
 [data-testid="stProgress"] [role="progressbar"] > div > div {background:var(--si-accent)!important;transition:width .6s cubic-bezier(.2,.7,.2,1)}
 [data-testid="stProgress"] [role="progressbar"] {background:var(--si-inset)!important}
+[data-testid="stProgressBarTrack"] {background:var(--si-inset)!important}
 [data-testid="stTabs"] button {color:var(--si-muted)}
 [data-testid="stTabs"] button[aria-selected="true"] {color:var(--si-accent)!important}
 .si-logo {display:flex;align-items:center;gap:.6rem;font-size:1.5rem;font-weight:750;letter-spacing:-.05em;margin-bottom:.2rem}

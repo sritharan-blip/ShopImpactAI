@@ -13,7 +13,7 @@ import time
 from urllib.request import urlopen
 
 from PIL import Image
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, expect
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'test-results'
@@ -35,7 +35,11 @@ def assert_no_errors(page):
 
 
 def assert_primary_contrast(page):
-    colors = page.locator('button[data-testid="stBaseButton-primary"]').filter(has_text='Log a purchase').evaluate('b=>({bg:getComputedStyle(b).backgroundColor,fg:getComputedStyle(b.querySelector("p")).color})')
+    button = page.locator('button[data-testid="stBaseButton-primary"]').filter(has_text='Log a purchase')
+    dark = page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--si-page').trim() === '#0B1415'")
+    expect(button).to_have_css('background-color', 'rgb(199, 242, 138)' if dark else 'rgb(35, 105, 79)')
+    expect(button.locator('p')).to_have_css('color', 'rgb(20, 38, 23)' if dark else 'rgb(255, 255, 255)')
+    colors = button.evaluate('b=>({bg:getComputedStyle(b).backgroundColor,fg:getComputedStyle(b.querySelector("p")).color})')
     def luminance(value):
         channels = [int(v) / 255 for v in value.strip('rgb()').split(',')]
         return sum(weight * (v / 12.92 if v <= .04045 else ((v + .055) / 1.055) ** 2.4)
