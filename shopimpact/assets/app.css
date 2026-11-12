@@ -12,7 +12,7 @@ html,body,.stApp{background:var(--si-page);color:var(--si-text);font-family:"Seg
 [data-testid="stSidebar"]{border-right:1px solid var(--si-glass-border)}
 [data-testid="stSidebarUserContent"]{padding-top:2rem}
 /* No color/background transitions: every theme paint keeps foregrounds paired. */
-.stApp *,.stApp *:before,.stApp *:after{transition-property:transform,box-shadow,border-color,opacity!important}
+body *,body *:before,body *:after{transition-property:transform,box-shadow,border-color,opacity!important}
 h1,h2,h3,h4,p,label,summary,[data-testid="stWidgetLabel"],[data-testid="stMarkdownContainer"],
 [data-testid="stMetricValue"],[data-testid="stText"],[data-testid="stCode"]{color:var(--si-text)}
 h1,h2,h3,h4{font-family:"Segoe UI Variable Display",Inter,"Segoe UI",sans-serif;letter-spacing:-.045em}
@@ -73,6 +73,11 @@ input::placeholder,textarea::placeholder{color:var(--si-muted)!important;opacity
 [role="option"]:hover,[role="option"][aria-selected="true"],[role="dialog"] [role="gridcell"][aria-selected="true"]{background:var(--si-soft)!important}
 [data-baseweb="tag"]{background:var(--si-soft)!important;color:var(--si-text)!important}
 [data-testid="stFileUploaderDropzone"]{background:var(--si-inset);border:1px dashed var(--si-border);border-radius:16px;color:var(--si-text)}
+[data-testid="stFileUploader"] button{background:var(--si-inset)!important;color:var(--si-text)!important;border-color:var(--si-border)!important}
+[data-testid="stFileUploader"] button *{color:var(--si-text)!important}
+[data-testid="stToast"],[data-testid="stToast"]>div,[data-baseweb="toast"],
+[data-testid="stToastContainer"]>div{background:var(--si-surface)!important;color:var(--si-text)!important;border-color:var(--si-border)!important;backdrop-filter:blur(24px)}
+[data-testid="stToast"] *,[data-baseweb="toast"] *{color:var(--si-text)!important}
 [data-testid="stAlert"]{background:var(--si-soft);border:1px solid var(--si-border);border-radius:16px}
 [data-testid="stAlert"] p{color:var(--si-text)}
 [data-testid="stCheckbox"] *,[data-testid="stToggle"] *,[data-testid="stSlider"] [data-testid="stMarkdownContainer"]{color:var(--si-text)}
@@ -95,6 +100,8 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--si-accent)}
 [data-testid="stProgressBarTrack"],[data-testid="stProgress"] [role="progressbar"],[data-testid="stProgress"] [role="progressbar"]>div{background:var(--si-inset)!important;border-radius:20px}
 [data-testid="stProgress"] [role="progressbar"]>div>div{background:var(--si-accent)!important;border-radius:20px}
 [data-testid="stTabs"] button{color:var(--si-muted)}[data-testid="stTabs"] button[aria-selected="true"]{color:var(--si-accent)!important}
+[role="dialog"] button,[data-baseweb="calendar"] button{background:var(--si-inset)!important;color:var(--si-text)!important}
+[role="dialog"] [role="gridcell"] *,[data-baseweb="calendar"] *{color:var(--si-text)!important}
 hr{border-color:var(--si-border)!important;opacity:.5}
 .si-logo{display:flex;align-items:center;gap:.65rem;font-weight:750;font-size:1.55rem;letter-spacing:-.06em}
 .si-logo-mark{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--si-glass-border);border-radius:13px;background:linear-gradient(145deg,var(--si-accent),var(--si-violet));color:var(--si-accent-text);box-shadow:0 4px 22px var(--si-glow);font-size:1.35rem}

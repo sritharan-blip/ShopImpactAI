@@ -73,7 +73,9 @@ def _render_purchase_view(purchases: list[dict], dark_mode: bool) -> None:
 
     estimated_co2 = calculate_impact(category, price)
     preview_co2 = round(min(LOW_IMPACT_FACTOR, CATEGORIES[category]["factor"]) * price / 10, 2) if greener_choice else estimated_co2
-    impact_color = "#EF4444" if CATEGORIES[category]["level"] == "High" else "#F59E0B" if CATEGORIES[category]["level"] == "Medium" else "#059669"
+    impact_colors = ({'High': '#FF9EA8', 'Medium': '#FFD58A', 'Low': '#82EAD0', 'Very low': '#82EAD0'}
+                     if dark_mode else {'High': '#B62039', 'Medium': '#8A5A00', 'Low': '#126A52', 'Very low': '#126A52'})
+    impact_color = impact_colors[CATEGORIES[category]['level']]
     st.markdown(
         f"<span class='si-muted'>Estimate preview:</span> <strong>{preview_co2:.2f} kg CO2e</strong> "
         f"<span style='color:{impact_color};font-weight:700'>· {CATEGORIES[category]['level']} impact</span>",

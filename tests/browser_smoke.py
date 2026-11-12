@@ -25,7 +25,7 @@ AUDIT = r'''() => {
   const lum=a=>a.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0);
   window.auditContrast=()=>{
     const base=rgba(getComputedStyle(document.querySelector('.stApp')).backgroundColor),bad=[];
-    for(const e of document.querySelectorAll('h1,h2,h3,p,[role="combobox"],[role="spinbutton"],[data-testid="stMetricValue"]')){
+    for(const e of document.querySelectorAll('h1,h2,h3,p,[role="combobox"],[role="spinbutton"],[data-testid="stMetricValue"],[style*="color:"]')){
       const r=e.getBoundingClientRect();if(!r.width||!r.height||r.bottom<0||r.top>innerHeight||getComputedStyle(e).visibility==='hidden')continue;
       let fg=rgba(getComputedStyle(e).color);if(fg[3]===0)continue;
       const layers=[];for(let p=e;p;p=p.parentElement)layers.push(rgba(getComputedStyle(p).backgroundColor));
@@ -42,7 +42,10 @@ AUDIT = r'''() => {
 
 
 def capture(page, name):
-    page.evaluate("window.scrollTo(0,0);document.querySelector('[data-testid=\"stMain\"]')?.scrollTo(0,0)")
+    page.evaluate("""window.scrollTo(0,0);document.querySelector('[data-testid="stMain"]')?.scrollTo(0,0);
+      const sidebar=document.querySelector('[data-testid="stSidebar"]');
+      if(sidebar)for(const e of [sidebar,...sidebar.querySelectorAll('div')])
+        if(/auto|scroll/.test(getComputedStyle(e).overflowY))e.scrollTo(0,0);""")
     data = page.screenshot(path=str(OUTPUT / (name + '.png')), animations='disabled')
     image = Image.open(io.BytesIO(data)).convert('RGB')
     image.thumbnail((1240, 1000))
@@ -89,9 +92,10 @@ try:
         page.evaluate(AUDIT)
         assert page.locator('.si-float-card').count() == 3
         assert page.locator('.si-hero').evaluate('(e)=>getComputedStyle(e).backdropFilter') != 'none'
-        capture(page, 'daylight-overview')
-        for mode in ['Midnight', 'Daylight', 'Midnight']:
+        for mode in ['Midnight', 'Daylight']:
             switch(page, mode)
+        capture(page, 'daylight-overview')
+        switch(page, 'Midnight')
         capture(page, 'midnight-overview')
         page.get_by_text('Discover products', exact=True).click()
         page.get_by_text('Your smart matches', exact=True).wait_for()
