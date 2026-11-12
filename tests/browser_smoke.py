@@ -34,6 +34,16 @@ def assert_no_errors(page):
     assert page.locator('[data-testid="stException"]').count() == 0, page.locator('body').inner_text()
 
 
+def assert_primary_contrast(page):
+    colors = page.locator('button[data-testid="stBaseButton-primary"]').filter(has_text='Log a purchase').evaluate('b=>({bg:getComputedStyle(b).backgroundColor,fg:getComputedStyle(b.querySelector("p")).color})')
+    def luminance(value):
+        channels = [int(v) / 255 for v in value.strip('rgb()').split(',')]
+        return sum(weight * (v / 12.92 if v <= .04045 else ((v + .055) / 1.055) ** 2.4)
+                   for weight, v in zip([.2126, .7152, .0722], channels))
+    a, b = sorted([luminance(colors['bg']), luminance(colors['fg'])])
+    assert (b + .05) / (a + .05) >= 4.5, colors
+
+
 server = subprocess.Popen([sys.executable, '-m', 'streamlit', 'run', 'ShopImpactAI.py',
     '--server.address', '127.0.0.1', '--server.port', '8519', '--server.headless', 'true',
     '--server.fileWatcherType', 'none'], cwd=ROOT, stdout=subprocess.DEVNULL)
@@ -56,11 +66,13 @@ try:
         page.locator('.si-hero small').filter(has_text='9 purchases').wait_for()
         page.wait_for_function("document.querySelector('.si-hero-art img')?.naturalWidth > 0")
         assert_no_errors(page)
+        assert_primary_contrast(page)
         print('CONTROLS:' + json.dumps(page.locator('button').evaluate_all('(buttons)=>buttons.filter(b=>b.textContent.includes("Midnight")||b.textContent.includes("Daylight")).map(b=>({text:b.textContent,testid:b.dataset.testid,role:b.getAttribute("role"),html:b.outerHTML.slice(0,1000)}))')), flush=True)
         capture(page, 'daylight-overview')
         page.get_by_text('Midnight', exact=True).click()
         page.wait_for_function("getComputedStyle(document.documentElement).getPropertyValue('--si-page').trim() === '#0B1415'")
         assert_no_errors(page)
+        assert_primary_contrast(page)
         capture(page, 'midnight-overview')
         page.get_by_text('Discover products', exact=True).click()
         page.get_by_text('Your smart matches', exact=True).wait_for()
@@ -69,6 +81,9 @@ try:
         page.locator('[data-testid="stSidebar"]').get_by_text('Log a purchase', exact=True).click()
         page.get_by_role('textbox', name='Product', exact=True).wait_for()
         assert_no_errors(page)
+        controls = page.locator('[data-testid="stSelectbox"] [role="combobox"]').evaluate_all('els=>els.map(e=>({background:getComputedStyle(e).backgroundColor,html:e.outerHTML.slice(0,500)}))')
+        print('FORM_CONTROLS:' + json.dumps(controls), flush=True)
+        assert controls and all(c['background'] == 'rgb(28, 44, 43)' for c in controls), controls
         capture(page, 'midnight-form')
         page.locator('[data-testid="stSidebar"]').get_by_text('Overview', exact=True).click()
         page.locator('.si-hero').wait_for()

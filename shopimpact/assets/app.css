@@ -9,7 +9,7 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {
 }
 [data-testid="stAppViewContainer"] {background:radial-gradient(ellipse at 90% 0%,var(--si-glow),transparent 45%),var(--si-page)}
 [data-testid="stHeader"] {background:var(--si-page);color:var(--si-text);border-bottom:1px solid var(--si-border)}
-.block-container {max-width:1480px;padding-top:2rem;padding-bottom:3rem}
+.block-container {max-width:1480px;padding-top:4.8rem;padding-bottom:3rem}
 [data-testid="stSidebar"] {background:var(--si-surface);border-right:1px solid var(--si-border);color:var(--si-text)}
 [data-testid="stSidebar"] > div:first-child {background:var(--si-surface)}
 [data-testid="stSidebarUserContent"] {padding-top:1.8rem}
@@ -35,13 +35,16 @@ button[kind="primary"],button[kind="primaryFormSubmit"],
 button[data-testid="stBaseButton-primary"],button[data-testid="stBaseButton-primaryFormSubmit"] {
   background:var(--si-accent)!important;color:var(--si-accent-text)!important;border-color:var(--si-accent)!important
 }
+button[data-testid="stBaseButton-primary"] *,button[data-testid="stBaseButton-primaryFormSubmit"] * {
+  color:var(--si-accent-text)!important
+}
 button:disabled {opacity:.45;cursor:not-allowed}
 [data-testid="stMetric"] {position:relative;overflow:hidden;border:1px solid var(--si-border);background:var(--si-surface);
   border-radius:18px;padding:1.1rem 1.2rem;box-shadow:var(--si-shadow);animation:si-rise .45s ease both}
 [data-testid="stMetric"]:before {content:"";position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--si-accent);border-radius:3px}
 [data-testid="stMetric"]:hover {transform:translateY(-3px);border-color:var(--si-accent)}
 [data-testid="stMetricValue"] {font-variant-numeric:tabular-nums;letter-spacing:-.04em;font-weight:650}
-[data-testid="stMetricDelta"] {color:var(--si-muted)}
+[data-testid="stMetricDelta"],[data-testid="stMetricDelta"] * {color:var(--si-muted)!important;background:var(--si-soft)!important}
 [data-testid="stVerticalBlockBorderWrapper"] > div,
 [data-testid="stForm"],[data-testid="stExpander"] details {background:var(--si-surface);border-color:var(--si-border)!important;border-radius:18px!important}
 [data-testid="stForm"] {padding:1.4rem!important}
@@ -53,6 +56,20 @@ input::placeholder,textarea::placeholder {color:var(--si-muted)!important;opacit
 [data-baseweb="input"]:focus-within,[data-baseweb="select"]:focus-within > div {border-color:var(--si-accent)!important;box-shadow:0 0 0 2px var(--si-soft)}
 [data-testid="stNumberInput"] button {background:var(--si-inset)!important;color:var(--si-text)!important}
 [data-baseweb="select"] svg,[data-testid="stExpander"] svg,[data-testid="stSidebar"] svg {fill:currentColor;color:var(--si-muted)}
+[data-testid="stSelectbox"] [role="combobox"],[data-testid="stMultiSelect"] [role="combobox"],
+[data-testid="stDateInput"] input,[data-testid="stDateInput"] button,
+[data-testid="stDateInput"] div:has(> input) {
+  background:var(--si-inset)!important;color:var(--si-text)!important;border-color:var(--si-border)!important
+}
+[data-testid="stSelectbox"] [role="combobox"] *,[data-testid="stMultiSelect"] [role="combobox"] *,
+[data-testid="stDateInput"] button * {color:var(--si-text)!important}
+[role="listbox"],[role="listbox"] [role="option"],[role="dialog"],
+[role="dialog"] [role="grid"],[role="dialog"] [role="gridcell"] {
+  background:var(--si-surface)!important;color:var(--si-text)!important;border-color:var(--si-border)!important
+}
+[role="listbox"] [role="option"] * {color:var(--si-text)!important;background:transparent!important}
+[role="listbox"] [role="option"][aria-selected="true"],
+[role="dialog"] [role="gridcell"][aria-selected="true"] {background:var(--si-soft)!important}
 [data-baseweb="popover"] > div,[data-baseweb="menu"],[role="listbox"],
 [data-baseweb="calendar"],[data-baseweb="calendar"] div {background:var(--si-surface);color:var(--si-text)}
 [role="option"],[role="option"] span,[data-baseweb="calendar"] button {color:var(--si-text)!important;background:var(--si-surface)}
@@ -72,8 +89,10 @@ input::placeholder,textarea::placeholder {color:var(--si-muted)!important;opacit
 [data-testid="stButtonGroup"] button,.st-key-appearance button {background:var(--si-inset)!important;color:var(--si-muted)!important;border:1px solid var(--si-border)!important;min-height:2.5rem}
 [data-testid="stButtonGroup"] button[aria-checked="true"], [data-testid="stButtonGroup"] button[aria-pressed="true"],
 .st-key-appearance button[aria-checked="true"],.st-key-appearance button[aria-pressed="true"] {background:var(--si-accent)!important;color:var(--si-accent-text)!important;border-color:var(--si-accent)!important;box-shadow:var(--si-shadow)}
-[data-testid="stProgress"] [role="progressbar"] > div > div {background:var(--si-accent);transition:width .6s cubic-bezier(.2,.7,.2,1)}
-[data-testid="stProgress"] [role="progressbar"] {background:var(--si-inset)}
+.st-key-appearance button[aria-checked="true"] *,.st-key-appearance button[aria-pressed="true"] * {color:var(--si-accent-text)!important}
+[data-testid="stProgress"] [role="progressbar"] > div {background:var(--si-inset)!important}
+[data-testid="stProgress"] [role="progressbar"] > div > div {background:var(--si-accent)!important;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+[data-testid="stProgress"] [role="progressbar"] {background:var(--si-inset)!important}
 [data-testid="stTabs"] button {color:var(--si-muted)}
 [data-testid="stTabs"] button[aria-selected="true"] {color:var(--si-accent)!important}
 .si-logo {display:flex;align-items:center;gap:.6rem;font-size:1.5rem;font-weight:750;letter-spacing:-.05em;margin-bottom:.2rem}
@@ -122,6 +141,6 @@ input::placeholder,textarea::placeholder {color:var(--si-muted)!important;opacit
 @keyframes si-orbit {to{transform:rotate(360deg)}}
 @keyframes si-pulse {50%{opacity:.5}}
 @keyframes si-marquee {to{transform:translateX(-50%)}}
-@media(max-width:850px){.si-hero{grid-template-columns:1fr}.si-hero-art{display:none}.si-hero{min-height:270px}.block-container{padding-top:1rem}}
+@media(max-width:850px){.si-hero{grid-template-columns:1fr}.si-hero-art{display:none}.si-hero{min-height:270px}.block-container{padding-top:4.5rem}}
 @media(max-width:600px){.block-container{padding-left:1rem;padding-right:1rem}.si-hero{border-radius:18px;padding:1.5rem}.si-hero h1{font-size:2.9rem!important}[data-testid="stMetricValue"]{font-size:1.6rem}.si-marquee{margin-bottom:1rem}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
