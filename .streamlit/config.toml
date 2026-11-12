@@ -4,18 +4,18 @@ baseRadius = "0.7rem"
 buttonRadius = "0.7rem"
 
 [theme.light]
-primaryColor = "#23694F"
-backgroundColor = "#F6F5EF"
-secondaryBackgroundColor = "#FFFEFA"
-textColor = "#172D26"
-borderColor = "#CFD7CD"
+primaryColor = "#3153D5"
+backgroundColor = "#EEF3FD"
+secondaryBackgroundColor = "#FAFCFF"
+textColor = "#17223B"
+borderColor = "#BBCBE3"
 
 [theme.dark]
-primaryColor = "#C7F28A"
-backgroundColor = "#0B1415"
-secondaryBackgroundColor = "#142121"
-textColor = "#F0F5E9"
-borderColor = "#39504A"
+primaryColor = "#80E7FF"
+backgroundColor = "#070C19"
+secondaryBackgroundColor = "#111D32"
+textColor = "#F2F6FF"
+borderColor = "#405578"
 
 [browser]
 gatherUsageStats = false

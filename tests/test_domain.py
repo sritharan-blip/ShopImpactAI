@@ -12,6 +12,7 @@ from shopimpact.logic import (_new_purchase, _new_wishlist_item, calculate_impac
                               _month_end_forecast, _month_end_spend_forecast)
 from shopimpact.recommendations import recommend_products
 from shopimpact.theme import PALETTES
+from shopimpact.decisions import decision_projection
 
 
 class DomainTests(unittest.TestCase):
@@ -140,6 +141,16 @@ class DomainTests(unittest.TestCase):
                 with self.subTest(mode=mode, foreground=fg, background=bg):
                     a, b = sorted([luminance(palette[fg]), luminance(palette[bg])])
                     self.assertGreaterEqual((b + .05) / (a + .05), 4.5)
+
+    def test_cost_per_use_and_budget(self):
+        self.assertEqual(decision_projection(120, 3, 2, 200, 600),
+                         {'uses': 312, 'cost_per_use': .38, 'remaining': 280, 'budget_share': 20})
+        self.assertEqual(decision_projection(200, 1, 1, 500, 600)['remaining'], -100)
+
+    def test_decision_model_invalid_assumptions(self):
+        for values in [(120, 0, 2), (-1, 3, 2), (120, 3, 0), (float('nan'), 3, 2), (120, float('inf'), 2)]:
+            with self.subTest(values=values), self.assertRaises(ValueError):
+                decision_projection(*values)
 
 
 if __name__ == '__main__':

@@ -32,27 +32,19 @@ def _illustrated_html(markup: str) -> None:
     st.html(re.sub(r'<svg\b.*?</svg>', encode, markup, flags=re.S))
 
 
-def render_hero(count: int) -> None:
-    _illustrated_html(f'''<section class="si-hero" aria-label="ShopImpact dashboard introduction">
-      <div><span class="si-status">A LITTLE MORE INTENTIONAL</span>
-      <h1>Good choices.<br><em>Better everyday.</em></h1>
-      <p>Know what you spend. Explore your footprint.<br>Find more meaning in what you bring home.</p>
+def render_hero(count: int, month_co2: float = 0, spend: float = 0, green_choices: int = 0) -> None:
+    st.html(f'''<section class="si-hero" aria-label="ShopImpact dashboard introduction">
+      <div><span class="si-status">YOUR IMPACT, IN MOTION</span>
+      <h1>Your everyday.<br><em>Reimagined.</em></h1>
+      <p>A clearer view of what you buy.<br>A lighter footprint for what comes next.</p>
       <small>{date.today():%A, %d %B} &nbsp; / &nbsp; {count} purchases tracked</small></div>
-      <div class="si-hero-art" aria-hidden="true">
-      <svg viewBox="0 0 360 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="180" cy="150" r="125" fill="var(--si-soft)"/>
-      <g class="si-orbit"><ellipse cx="180" cy="150" rx="155" ry="90" stroke="var(--si-border)" stroke-dasharray="3 7"/><circle cx="335" cy="150" r="7" fill="currentColor"/></g>
-      <g class="si-bag"><path d="M112 100h138l-13 150H125z" fill="var(--si-accent)"/>
-      <path d="M149 106V81c0-45 64-45 64 0v25" stroke="var(--si-text)" stroke-width="9" stroke-linecap="round"/>
-      <path d="M180 202c-32-8-39-34-27-58 27 1 46 24 27 58Z" fill="var(--si-accent-text)"/>
-      <path d="M180 202c2-39 23-58 47-54 0 31-20 47-47 54Z" fill="var(--si-accent-text)" opacity=".65"/>
-      <path d="M180 216v-43" stroke="var(--si-accent-text)" stroke-width="3"/>
-      <path d="M131 235h101" stroke="var(--si-accent-text)" opacity=".3"/></g>
-      <g class="si-orbit-card"><rect x="22" y="90" width="78" height="57" rx="12" fill="var(--si-surface)" stroke="var(--si-border)"/>
-      <path d="m43 118 11 9 21-23" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      <rect x="254" y="42" width="65" height="56" rx="12" fill="var(--si-surface)" stroke="var(--si-border)"/>
-      <path d="M273 78V66m12 12V59m12 19V53" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></g>
-      </svg><div class="si-hero-note"><strong>Less impulse.</strong><br>More intention.</div></div></section>''')
+      <div class="si-hero-art" aria-label="Your monthly shopping snapshot">
+        <div class="si-sphere" aria-hidden="true"></div><div class="si-orbit-ring" aria-hidden="true"></div>
+        <div class="si-float-card one"><small>Monthly footprint</small><strong>{month_co2:.1f} <span>kg CO2e</span></strong><span>Directional estimate</span></div>
+        <div class="si-float-card two"><small>Spend tracked</small><strong>${spend:,.0f}</strong><span>This month</span></div>
+        <div class="si-float-card three"><small>Lower-impact picks</small><strong>{green_choices} <span>and counting</span></strong>
+          <div class="si-mini-bars" aria-hidden="true"><i style="--h:35%;--d:0s"></i><i style="--h:65%;--d:-.5s"></i><i style="--h:50%;--d:-1s"></i><i style="--h:85%;--d:-1.5s"></i><i style="--h:72%;--d:-2s"></i><i style="--h:100%;--d:-2.5s"></i></div></div>
+      </div></section>''')
 
 
 def render_ticker() -> None:

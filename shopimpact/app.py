@@ -24,6 +24,7 @@ def _keep_appearance_selected() -> None:
         st.session_state.appearance = st.session_state.get('last_appearance', 'Daylight')
     else:
         st.session_state.last_appearance = mode
+    st.session_state.dark_mode = st.session_state.appearance == 'Midnight'
 
 
 def main() -> None:
@@ -40,19 +41,27 @@ def main() -> None:
     st.session_state.setdefault("dark_mode", False)
     st.session_state.setdefault("high_contrast", False)
     st.session_state.setdefault("reduce_motion", False)
-    heading, appearance = st.columns([1.8, 1])
+    # Paint the active palette before emitting any interactive UI on each rerun.
+    st.session_state.dark_mode = st.session_state.get('appearance', 'Daylight') == 'Midnight'
+    apply_custom_css(st.session_state.dark_mode, st.session_state.high_contrast, st.session_state.reduce_motion)
+    heading, quick, appearance = st.columns([1.35, .7, 1])
     with heading:
-        st.html('<div class="si-topline">SHOPIMPACT &nbsp; / &nbsp; YOUR CONSCIOUS SHOPPING STUDIO</div>')
+        st.html('<div class="si-topline"><span class="si-live-dot"></span>SHOPIMPACT <span>/</span> YOUR PERSONAL IMPACT SPACE</div>')
+    with quick:
+        with st.popover('Quick actions', icon=':material/bolt:', width='stretch'):
+            from .navigation import _navigate_to
+            for destination, label in [('Log purchase', 'Log a purchase'), ('Discover', 'Explore smart matches'),
+                                       ('Decision lab', 'Open Decision lab'), ('Wishlist', 'Open wishlist')]:
+                st.button(label, key='quick_' + destination, on_click=_navigate_to, args=(destination,), width='stretch')
     with appearance:
         mode = st.segmented_control("Appearance", ["Daylight", "Midnight"], default="Daylight",
                                     key="appearance", selection_mode="single", width="stretch",
                                     on_change=_keep_appearance_selected)
-    st.session_state.dark_mode = mode == "Midnight"
-    apply_custom_css(st.session_state.dark_mode, st.session_state.high_contrast, st.session_state.reduce_motion)
 
     views = [
         "Overview",
         "Discover",
+        "Decision lab",
         "Log purchase",
         "Wishlist",
         "Cart & checkout",
@@ -66,6 +75,7 @@ def main() -> None:
     view_labels = {
         "Overview": "Overview",
         "Discover": "Discover products",
+        "Decision lab": "Decision lab",
         "Log purchase": "Log a purchase",
         "Wishlist": f"Mindful wishlist · {len(st.session_state.wishlist)}",
         "Cart & checkout": f"Cart & checkout · {sum(st.session_state.cart.values())}",
@@ -156,6 +166,9 @@ def main() -> None:
             _render_overview(purchases, st.session_state.dark_mode, monthly_budget, monthly_target)
         elif view == "Discover":
             _render_catalog(purchases)
+        elif view == "Decision lab":
+            from .decisions import render_decision_lab
+            render_decision_lab(purchases)
         elif view == "Wishlist":
             _render_wishlist()
         elif view == "Cart & checkout":

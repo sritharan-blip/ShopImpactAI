@@ -5,7 +5,7 @@ import unittest
 from streamlit.testing.v1 import AppTest
 
 ENTRY = str(Path(__file__).resolve().parents[1] / 'ShopImpactAI.py')
-VIEWS = ['Overview', 'Discover', 'Log purchase', 'Wishlist', 'Cart & checkout',
+VIEWS = ['Overview', 'Discover', 'Decision lab', 'Log purchase', 'Wishlist', 'Cart & checkout',
          'My orders', 'Impact analytics', 'Swap studio', 'Eco rewards', 'Help & returns', 'Profile']
 
 
@@ -78,6 +78,17 @@ class AppTests(unittest.TestCase):
         self.assertEqual(list(app.exception), [])
         self.assertTrue(app.session_state['reduce_motion'])
         self.assertTrue(app.session_state['high_contrast'])
+
+    def test_decision_lab_saves_a_pause_plan(self):
+        app = self.app()
+        app.radio(key='view').set_value('Decision lab').run()
+        app.text_input(key='decision_product').set_value('Headphones')
+        app.button(key='save_decision').click().run()
+        self.assertEqual(list(app.exception), [])
+        item = app.session_state['wishlist'][0]
+        self.assertEqual(item['product'], 'Headphones')
+        self.assertIn('Decision lab', item['note'])
+        self.assertGreater(date.fromisoformat(item['revisit_on']), date.today())
 
 
 if __name__ == '__main__':

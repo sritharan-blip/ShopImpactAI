@@ -1,8 +1,4 @@
-"""Optional real-Chrome checks. Install playwright, then run this file.
-
-Uses an isolated browser context with demo data only. Saves screenshots as CI
-artifacts; small encoded previews make remote visual review possible as well.
-"""
+"""Real Chrome checks, including contrast sampled throughout appearance changes."""
 import base64
 import io
 import json
@@ -13,39 +9,61 @@ import time
 from urllib.request import urlopen
 
 from PIL import Image
-from playwright.sync_api import sync_playwright, expect
+from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from shopimpact.theme import PALETTES
 OUTPUT = ROOT / 'test-results'
 OUTPUT.mkdir(exist_ok=True)
 
+# Composite CSS backgrounds through the ancestor chain, then audit the actual
+# foregrounds, rather than assuming that a primary button implies readable text.
+AUDIT = r'''() => {
+  const rgba = s => {let a=(s.match(/[\d.]+/g)||[]).map(Number);return a.length>=3?[a[0],a[1],a[2],a.length>3?a[3]:1]:[0,0,0,0]};
+  const over=(a,b)=>a.slice(0,3).map((v,i)=>v*a[3]+b[i]*(1-a[3]));
+  const lum=a=>a.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0);
+  window.auditContrast=()=>{
+    const base=rgba(getComputedStyle(document.querySelector('.stApp')).backgroundColor),bad=[];
+    for(const e of document.querySelectorAll('h1,h2,h3,p,[role="combobox"],[role="spinbutton"],[data-testid="stMetricValue"]')){
+      const r=e.getBoundingClientRect();if(!r.width||!r.height||r.bottom<0||r.top>innerHeight||getComputedStyle(e).visibility==='hidden')continue;
+      let fg=rgba(getComputedStyle(e).color);if(fg[3]===0)continue;
+      const layers=[];for(let p=e;p;p=p.parentElement)layers.push(rgba(getComputedStyle(p).backgroundColor));
+      let bg=base.slice(0,3);for(const layer of layers.reverse())bg=over(layer,bg);
+      fg=over(fg,bg);const a=lum(fg),b=lum(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+      const large=(parseFloat(getComputedStyle(e).fontSize)>=24),minimum=large?3:4.5;
+      if(ratio<minimum-.02)bad.push({text:(e.textContent||e.value||e.getAttribute('aria-label')||'').trim().slice(0,65),ratio:+ratio.toFixed(2),foreground:fg,background:bg});
+    }return bad;
+  };
+  window.startContrastWatch=()=>{window.contrastFailures=[];window.contrastRunning=true;const until=performance.now()+1500;
+    function frame(){const bad=window.auditContrast();if(bad.length&&window.contrastFailures.length<15)window.contrastFailures.push(...bad.slice(0,3));
+      if(performance.now()<until)requestAnimationFrame(frame);else window.contrastRunning=false;}requestAnimationFrame(frame);};
+}'''
+
 
 def capture(page, name):
-    page.evaluate("window.scrollTo(0,0); document.querySelector('[data-testid=\"stMain\"]')?.scrollTo(0,0)")
-    raw = page.screenshot(path=str(OUTPUT / (name + '.png')), animations='disabled')
-    image = Image.open(io.BytesIO(raw)).convert('RGB')
-    image.thumbnail((1100, 900))
-    data = io.BytesIO()
-    image.save(data, format='JPEG', quality=75)
-    print('PREVIEW:' + name + ':' + base64.b64encode(data.getvalue()).decode(), flush=True)
+    page.evaluate("window.scrollTo(0,0);document.querySelector('[data-testid=\"stMain\"]')?.scrollTo(0,0)")
+    data = page.screenshot(path=str(OUTPUT / (name + '.png')), animations='disabled')
+    image = Image.open(io.BytesIO(data)).convert('RGB')
+    image.thumbnail((1240, 1000))
+    buffer = io.BytesIO()
+    image.save(buffer, format='JPEG', quality=82)
+    print('PREVIEW:' + name + ':' + base64.b64encode(buffer.getvalue()).decode(), flush=True)
 
 
-def assert_no_errors(page):
+def healthy(page):
     assert page.locator('[data-testid="stException"]').count() == 0, page.locator('body').inner_text()
 
 
-def assert_primary_contrast(page):
-    button = page.locator('button[data-testid="stBaseButton-primary"]').filter(has_text='Log a purchase')
-    dark = page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--si-page').trim() === '#0B1415'")
-    expect(button).to_have_css('background-color', 'rgb(199, 242, 138)' if dark else 'rgb(35, 105, 79)')
-    expect(button.locator('p')).to_have_css('color', 'rgb(20, 38, 23)' if dark else 'rgb(255, 255, 255)')
-    colors = button.evaluate('b=>({bg:getComputedStyle(b).backgroundColor,fg:getComputedStyle(b.querySelector("p")).color})')
-    def luminance(value):
-        channels = [int(v) / 255 for v in value.strip('rgb()').split(',')]
-        return sum(weight * (v / 12.92 if v <= .04045 else ((v + .055) / 1.055) ** 2.4)
-                   for weight, v in zip([.2126, .7152, .0722], channels))
-    a, b = sorted([luminance(colors['bg']), luminance(colors['fg'])])
-    assert (b + .05) / (a + .05) >= 4.5, colors
+def switch(page, mode):
+    page.evaluate('window.startContrastWatch()')
+    page.get_by_text(mode, exact=True).click()
+    page.wait_for_function('(expected)=>getComputedStyle(document.documentElement).getPropertyValue("--si-page").trim()===expected',
+                           arg=PALETTES[mode == 'Midnight']['page'])
+    page.wait_for_function('window.contrastRunning===false')
+    failures = page.evaluate('window.contrastFailures')
+    assert not failures, json.dumps({'mode': mode, 'failures': failures})
+    healthy(page)
 
 
 server = subprocess.Popen([sys.executable, '-m', 'streamlit', 'run', 'ShopImpactAI.py',
@@ -63,49 +81,57 @@ try:
         raise RuntimeError('Test server did not start')
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(channel='chrome', headless=True)
-        page = browser.new_page(viewport={'width': 1440, 'height': 1100}, device_scale_factor=1)
+        page = browser.new_page(viewport={'width': 1600, 'height': 1100}, device_scale_factor=1)
         page.goto('http://127.0.0.1:8519')
         page.locator('.si-hero').wait_for()
         page.get_by_role('button', name='Load demo data', exact=True).click()
         page.locator('.si-hero small').filter(has_text='9 purchases').wait_for()
-        page.wait_for_function("document.querySelector('.si-hero-art img')?.naturalWidth > 0")
-        assert_no_errors(page)
-        assert_primary_contrast(page)
-        print('CONTROLS:' + json.dumps(page.locator('button').evaluate_all('(buttons)=>buttons.filter(b=>b.textContent.includes("Midnight")||b.textContent.includes("Daylight")).map(b=>({text:b.textContent,testid:b.dataset.testid,role:b.getAttribute("role"),html:b.outerHTML.slice(0,1000)}))')), flush=True)
+        page.evaluate(AUDIT)
+        assert page.locator('.si-float-card').count() == 3
+        assert page.locator('.si-hero').evaluate('(e)=>getComputedStyle(e).backdropFilter') != 'none'
         capture(page, 'daylight-overview')
-        page.get_by_text('Midnight', exact=True).click()
-        page.wait_for_function("getComputedStyle(document.documentElement).getPropertyValue('--si-page').trim() === '#0B1415'")
-        assert_no_errors(page)
-        assert_primary_contrast(page)
+        for mode in ['Midnight', 'Daylight', 'Midnight']:
+            switch(page, mode)
         capture(page, 'midnight-overview')
         page.get_by_text('Discover products', exact=True).click()
         page.get_by_text('Your smart matches', exact=True).wait_for()
-        assert_no_errors(page)
+        healthy(page)
         capture(page, 'midnight-discover')
-        page.locator('[data-testid="stSidebar"]').get_by_text('Log a purchase', exact=True).click()
+        sidebar = page.locator('[data-testid="stSidebar"]')
+        sidebar.get_by_text('Log a purchase', exact=True).click()
         page.get_by_role('textbox', name='Product', exact=True).wait_for()
-        assert_no_errors(page)
-        controls = page.locator('[data-testid="stSelectbox"] [role="combobox"]').evaluate_all('els=>els.map(e=>({background:getComputedStyle(e).backgroundColor,html:e.outerHTML.slice(0,500)}))')
-        print('FORM_CONTROLS:' + json.dumps(controls), flush=True)
-        assert controls and all(c['background'] == 'rgb(28, 44, 43)' for c in controls), controls
+        for mode in ['Daylight', 'Midnight']:
+            switch(page, mode)
         capture(page, 'midnight-form')
-        page.locator('[data-testid="stSidebar"]').get_by_text('Overview', exact=True).click()
+        combo = page.get_by_role('combobox', name='Category', exact=True)
+        combo.click()
+        page.get_by_role('option', name='Electronics', exact=True).wait_for()
+        assert not page.evaluate('window.auditContrast()'), page.evaluate('window.auditContrast()')
+        capture(page, 'midnight-dropdown')
+        page.keyboard.press('Escape')
+        sidebar.get_by_text('Decision lab', exact=True).click()
+        page.get_by_text('A little pause. A better decision.', exact=True).wait_for()
+        page.get_by_role('textbox', name='What caught your eye?', exact=True).fill('A useful jacket')
+        page.get_by_role('button', name='Save a pause plan', exact=True).click()
+        page.get_by_text('Saved. Revisit on', exact=False).wait_for()
+        healthy(page)
+        capture(page, 'decision-lab')
+        sidebar.get_by_text('Overview', exact=True).click()
         page.locator('.si-hero').wait_for()
-        # Close at desktop width before the responsive layout can remove the button.
-        close_sidebar = page.locator('[data-testid="stSidebarCollapseButton"] button')
-        if close_sidebar.count() and close_sidebar.is_visible():
-            close_sidebar.click()
+        collapse = page.locator('[data-testid="stSidebarCollapseButton"] button')
+        if collapse.count() and collapse.is_visible():
+            collapse.click()
         page.set_viewport_size({'width': 390, 'height': 844})
-        page.wait_for_timeout(300)
-        assert_no_errors(page)
+        page.wait_for_timeout(350)
+        healthy(page)
         width = page.evaluate('({viewport:innerWidth,document:document.documentElement.scrollWidth})')
         assert width['document'] <= width['viewport'] + 2, width
         capture(page, 'mobile-midnight')
         page.emulate_media(reduced_motion='reduce')
-        motion = page.locator('.si-marquee-track').evaluate('(e) => getComputedStyle(e).animationName')
-        assert motion == 'none', motion
+        assert page.locator('.si-sphere').evaluate('(e)=>getComputedStyle(e).animationName') == 'none'
+        assert page.locator('.si-marquee-track').evaluate('(e)=>getComputedStyle(e).animationName') == 'none'
         browser.close()
-    print('Real Chrome checks passed: themes, catalog, form, mobile, reduced motion.', flush=True)
+    print('Chrome passed: glass, repeated switching with frame-sampled contrast, dropdowns, Decision lab, mobile and reduced motion.', flush=True)
 finally:
     server.terminate()
     server.wait(timeout=10)

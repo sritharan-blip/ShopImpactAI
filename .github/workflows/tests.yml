@@ -1,7 +1,9 @@
 name: App checks
 on:
   push:
+    paths-ignore: ['README.md', 'CHANGELOG.md', 'assets/**', 'tools/generate_banner.py']
   pull_request:
+    paths-ignore: ['README.md', 'CHANGELOG.md', 'assets/**', 'tools/generate_banner.py']
 permissions:
   contents: read
 jobs:

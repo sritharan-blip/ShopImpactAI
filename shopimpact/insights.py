@@ -30,11 +30,11 @@ def _render_overview(
     eco_score = round(max(0, min(100, 65 * (1 - min(month_co2 / monthly_target, 1)) + 35 * (green_choices / len(month_frame) if not month_frame.empty else 0))))
     total_co2 = float(frame["co2"].sum()) if not frame.empty else 0.0
 
-    render_hero(len(purchases))
+    render_hero(len(purchases), month_co2, spend, green_choices)
     cta_left, cta_right, cta_swap, cta_wishlist = st.columns(4)
     cta_left.button("Log a purchase", type="primary", icon=":material/add_shopping_cart:", on_click=_navigate_to, args=("Log purchase",), key="overview_log", width="stretch")
     cta_right.button("Discover your next favorite", icon=":material/storefront:", on_click=_navigate_to, args=("Discover",), key="overview_discover", width="stretch")
-    cta_swap.button("Find a better swap", icon=":material/compare_arrows:", on_click=_navigate_to, args=("Swap studio",), key="overview_swap", width="stretch")
+    cta_swap.button("Try Decision lab", icon=":material/auto_awesome:", on_click=_navigate_to, args=("Decision lab",), key="overview_swap", width="stretch")
     cta_wishlist.button("Your mindful wishlist", icon=":material/bookmark:", on_click=_navigate_to, args=("Wishlist",), key="overview_wishlist", width="stretch")
     render_ticker()
 
@@ -48,6 +48,12 @@ def _render_overview(
     goal_cols = st.columns(2)
     goal_cols[0].progress(min(spend / monthly_budget, 1.0), text=f"Spend plan · ${spend:,.2f} of ${monthly_budget:,.0f}")
     goal_cols[1].progress(min(month_co2 / monthly_target, 1.0), text=f"Carbon goal · {month_co2:.1f} of {monthly_target:.0f} kg CO2e")
+    remaining = max(0, monthly_budget - spend)
+    brief = (f'<strong>${remaining:,.0f} left in your monthly plan.</strong> '
+             f'{green_choices} of your {len(month_frame)} recorded choices are in lower-impact categories. '
+             'Use Decision lab to think through your next purchase before it reaches the cart.') if not month_frame.empty else (
+             '<strong>Your next choice starts here.</strong> Log a purchase for a personal snapshot, or load demo data to explore the studio.')
+    st.html(f'<aside class="si-brief"><span class="si-brief-icon" aria-hidden="true">✦</span><p>{brief}</p></aside>')
     if spend >= monthly_budget:
         st.warning("You have reached this month's shopping budget. Review the basket before your next checkout.")
     elif spend >= monthly_budget * 0.8:

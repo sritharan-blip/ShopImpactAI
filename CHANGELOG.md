@@ -1,5 +1,13 @@
 # Changes
 
+## Liquid glass edition
+
+- Rebuilt the visual system around frosted glass, aurora light, luminous edges, a dimensional orb, and floating cards driven by session data.
+- Applied appearance tokens before rendering controls and removed foreground/background color transitions to prevent unreadable text while switching.
+- Added a global quick-actions deck and Decision lab for cost per use, budget fit, and wishlist pause plans.
+- Rebuilt the README with a new animated cover, guided setup, feature overview, data boundaries, and architecture reference.
+- Extended regression and real-Chrome coverage to the new feature and repeated theme changes.
+
 ## 2026-11-12
 
 - Introduced Daylight and Midnight appearances with coordinated surfaces, inputs, tables, charts, and illustration colors.

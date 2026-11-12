@@ -1,117 +1,154 @@
-![ShopImpact — a little more intentional](assets/shopimpact-banner.gif)
+<div align="center">
+
+![ShopImpactAI — Your everyday. Reimagined.](assets/shopimpact-banner.gif)
 
 # ShopImpactAI
 
-**Good choices. Better everyday.** A personal studio for shopping with more intention.
+### Your everyday. Reimagined.
 
-## New in this edition
+A personal impact studio for the space between **wanting something** and **choosing it well**.
 
-- **Daylight & Midnight:** warm ivory and forest green, or deep ink and mint, with consistent cards, forms, tables, charts, and menus.
-- **Motion with purpose:** a floating shopping-bag hero, orbital accents, a moving inspiration strip, animated milestones, progress fills, page entrances, and responsive product illustrations.
-- **Your pace:** Reduce motion pauses decorative effects; your operating system's reduced-motion setting is also respected. High contrast is available under Display & accessibility.
-- **Smart matches:** a local content-based recommender fits TF-IDF vectors to catalog descriptions, then ranks matches using shopping intent, category, budget, and estimated reduction. Every pick explains its reasons. Profile lets you disable purchase-history personalization. This is an explainable recommendation model, not a generative assistant or a verified environmental endorsement.
-- **Consistent units:** carbon reductions use `carbon_saved_kg` and are shown in kg CO2e. They are never represented as money savings.
-- **Stable backups:** version 2 preserves recorded footprint and baseline snapshots, IDs, and wishlist dates. Restoring a catalog purchase keeps its original estimate, even if category factors later change.
+[![App checks](https://github.com/sritharan-blip/ShopImpactAI/actions/workflows/tests.yml/badge.svg)](https://github.com/sritharan-blip/ShopImpactAI/actions/workflows/tests.yml)
+![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3153D5?style=flat-square)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.60%2B-7450DA?style=flat-square)
+![Local recommendations](https://img.shields.io/badge/Recommendations-TF--IDF-117D78?style=flat-square)
 
-All commerce flows remain local demonstrations. No API key is needed.
+[The experience](#the-experience) · [Run locally](#run-locally) · [How it thinks](#how-it-thinks) · [Under the glass](#under-the-glass)
 
-ShopImpact is a session-based Streamlit demo for conscious shopping. It helps you record purchases, explore directional carbon-impact estimates, compare alternatives, and review spending and impact trends.
+</div>
 
-> **Demo notice:** Impact values are estimates based on broad category factors, not product-specific or independently verified lifecycle assessments. The marketplace, cart, checkout, orders, returns, and support tools are illustrative local demo flows. The app does not process payments, place real orders, contact a support team, or connect to a carrier.
+---
 
-## What you can do
+## The experience
 
-Use the sidebar to move between these sections:
+Track what you spend. Explore your estimated footprint. Find products that fit your intent. Take a breath before the next purchase.
 
-- **Overview** — See monthly spending, estimated footprint, lower-impact choices, eco score, and recent activity. Quick actions lead to common tasks.
-- **Discover** — Browse and filter a curated demo catalog, inspect product details, and explore suggested picks.
-- **Log a purchase** — Record a product, category, shop, price, date, and whether you chose a greener alternative. Each entry is added to your impact ledger.
-- **Wishlist** — Save ideas with a category, estimated price, priority, note, and revisit date. Wishlist estimates are not included in purchase totals.
-- **Cart & checkout** — Try the demo cart and checkout flow. No card details are collected and no payment or real order is submitted.
-- **My orders** — Review illustrative orders created in the current session.
-- **Impact analytics** — Explore summaries and charts based on the purchases in your current session.
-- **Swap studio** — Compare a purchase category with suggested lower-impact alternatives and review estimated differences.
-- **Eco rewards** — Review progress, badges, and challenges calculated from the session ledger.
-- **Help & returns** — Try the demo return and support forms. Requests are saved only in the current session and are not sent to anyone.
-- **Profile** — Set up the local demo profile; it is not a real account.
+| A clearer view | What you can do |
+| :--- | :--- |
+| **Liquid glass, two ways** | Frosted layers, moving aurora light, floating data cards, luminous edges, and a coordinated Daylight / Midnight palette. |
+| **Your impact, in motion** | Follow monthly spending, category estimates, lower-impact choices, goals, and your recent activity. The hero cards use your actual session data. |
+| **Smart matches** | Describe what you need. A local content model ranks the demo catalog by text similarity, category, budget, and estimated reduction, with reasons for every pick. |
+| **Decision lab** | Explore cost per use and budget fit. Save a pause plan to your wishlist for tomorrow, three days, or next week. |
+| **A more intentional wishlist** | Keep a shortlist, separate needs from wants, add notes, and choose a date to revisit an idea. |
+| **The full shopping journey** | Explore demo products, a cart, simulated checkout, orders, returns, rewards, and analytics in one connected session. |
 
-## Impact estimate
+**Motion with an off switch.** Floating panels, orbital light, gentle card lifts, and page entrances respect your operating system's reduced-motion preference. You can also pause them under **Display & accessibility → Reduce motion**, or enable **High contrast**.
 
-For logged purchases and CSV imports, ShopImpact calculates:
+**Color changes happen together.** Text, fields, selected controls, and their backgrounds use a single active palette. The animation lives in the glass and light rather than in fading text colors.
 
-```text
-estimated kg CO2e = category factor × price ÷ 10
-```
+<details>
+<summary><strong>Explore all 12 spaces</strong></summary>
 
-The built-in factors are expressed as estimated kg CO2e per $10:
+| Space | Inside |
+| :--- | :--- |
+| Overview | Monthly snapshot, goals, footprint trend, and personal activity brief |
+| Discover | Search, filter, product details, and explainable smart matches |
+| Decision lab | Cost per use, budget fit, and wishlist pause plans |
+| Log a purchase | Purchase ledger, literal search, CSV import, and export |
+| Wishlist | Need / want priorities, notes, estimated cost, and revisit dates |
+| Cart & checkout | Quantities, totals, and a non-binding demo checkout |
+| My orders | Illustrative session orders and tracking stages |
+| Impact analytics | Category summaries, comparisons, and budget pacing |
+| Swap studio | Assumed lower-factor scenarios and comparison baskets |
+| Eco rewards | Milestones, progress, and weekly challenges |
+| Help & returns | Local demo return and support forms |
+| Profile | Session profile and purchase-history personalization preferences |
 
-| Category | Factor | Indicative level |
-|---|---:|---|
-| Electronics | 3.5 | High |
-| Fast fashion / leather | 2.8 | High |
-| Groceries / organic food | 0.4 | Low |
-| Sustainable apparel / second-hand | 0.2 | Very low |
-| Beauty & personal care | 1.1 | Medium |
-| Home & living | 1.5 | Medium |
+</details>
 
-These simplified factors are for exploration and comparison only. Results can vary substantially by product, materials, location, energy source, transport, and methodology; do not use them as a formal footprint report.
+> **A prototype, with clear boundaries.** Commerce, ratings, product availability, payments, order tracking, returns, and support are demonstrations. Nothing is bought, charged, shipped, or sent to a support team. Carbon estimates are directional comparisons, not verified product lifecycle assessments.
 
 ## Run locally
 
-Use Python 3.10 or later.
+Requires **Python 3.10 or later**. No API key or Streamlit secrets are needed.
 
-### Windows PowerShell
+<details open>
+<summary><strong>Windows PowerShell</strong></summary>
 
 ```powershell
+git clone https://github.com/sritharan-blip/ShopImpactAI.git
+cd ShopImpactAI
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m streamlit run ShopImpactAI.py
 ```
 
-### macOS or Linux
+If activation is restricted, run the environment's Python directly:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m streamlit run ShopImpactAI.py
+```
+
+</details>
+
+<details>
+<summary><strong>macOS / Linux</strong></summary>
 
 ```bash
+git clone https://github.com/sritharan-blip/ShopImpactAI.git
+cd ShopImpactAI
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 python -m streamlit run ShopImpactAI.py
 ```
 
-Streamlit prints a local URL (usually `http://localhost:8501`) when the app starts. Stop the local server with **Ctrl+C** in the terminal.
+</details>
 
-## Dependencies
+Open the local address printed in your terminal, usually `http://localhost:8501`. Choose **Load demo data** for a populated dashboard. Stop the server with **Ctrl+C**.
 
-Install the project's dependencies from [`requirements.txt`](requirements.txt):
+For Streamlit Community Cloud, select this repository, the `main` branch, and `ShopImpactAI.py` as the main file.
 
-- Streamlit — app interface and session state
-- pandas — purchase data handling and CSV import/export
-- Plotly — interactive charts
-- Pillow — reproducible animated README banner
+## How it thinks
 
-## Import purchase history
+### Explainable matches, without an API
 
-1. Open **Log purchase** and expand **Import an existing purchase log**.
-2. Select **Get CSV template** to download a header row.
-3. Fill in the CSV and upload it.
-4. Select **Validate and import** to add valid rows to the current session ledger.
+The recommender fits **TF-IDF** vectors to the small built-in catalog and compares them with your shopping intent using cosine similarity. Category affinity and the catalog's estimated reduction add explicit ranking signals. A selected category and maximum budget are hard filters.
 
-Required columns:
+When intent is blank, recent purchase descriptions can personalize the ranking. Disable that use of history in **Profile**. A score ranks catalog items; it is not a confidence probability, an environmental certification, or a generative AI answer.
 
-| Column | Description |
-|---|---|
-| `product` | Non-empty product name |
-| `category` | One of the exact categories listed in the impact table above |
-| `price` | Finite, non-negative number |
+### Estimates that keep their units
 
-Optional columns:
+```text
+Category estimate (kg CO2e) = category factor × price ÷ 10
+Estimated reduction (kg CO2e) = max(0, recorded baseline − recorded footprint)
+Cost per use ($) = price ÷ (uses per week × 52 × years kept)
+```
 
-| Column | Description |
-|---|---|
-| `date` | ISO purchase date (`YYYY-MM-DD`); defaults to today if blank. Future dates are rejected. |
-| `brand` | Brand or shop name |
+Catalog checkout records its demo product factor and the category-average comparison baseline at purchase time. Manually choosing a greener scenario uses an assumed factor of at most 0.4 kg CO2e per $10. Decision lab uses your own usage and lifespan assumptions. These tools make assumptions visible; they do not measure product emissions or predict durability.
 
-Example:
+<details>
+<summary><strong>View the category factors</strong></summary>
+
+| Category | Estimated kg CO2e per $10 |
+| :--- | ---: |
+| Electronics | 3.5 |
+| Fast fashion / leather | 2.8 |
+| Groceries / organic food | 0.4 |
+| Sustainable apparel / second-hand | 0.2 |
+| Beauty & personal care | 1.1 |
+| Home & living | 1.5 |
+
+These are broad illustrative factors. Real footprints vary with materials, manufacturing, location, transport, energy sources, and methodology. Use this app for exploration rather than formal footprint reporting.
+
+</details>
+
+## Your data, your copy
+
+Working data lives in **Streamlit session state**, with no database or real account. A session ending or server restarting can clear it. Download a backup to keep your ledger and wishlist.
+
+| Tool | What it preserves |
+| :--- | :--- |
+| CSV import | Required `product`, `category`, `price`; optional ISO `date` and `brand`. Emissions are recalculated from category and price. |
+| JSON backup v2 | Ledger, wishlist, recorded footprints, comparison baselines, identifiers, and wishlist dates. |
+| Legacy v1 restore | Recorded CO2 snapshots are retained where present. The ambiguous old `green_savings` field is discarded, and reductions are recomputed from the footprint and baseline. |
+
+CSV imports are limited to **5 MB / 5,000 rows**; invalid rows are skipped and reported. Backups support **5 MB, 5,000 purchases, and 500 wishlist ideas**. Invalid backups reject the entire restore, leaving your current data intact. Backups exclude profile, cart, orders, support requests, and display preferences.
+
+<details>
+<summary><strong>A purchase CSV example</strong></summary>
 
 ```csv
 date,product,category,brand,price
@@ -119,60 +156,52 @@ date,product,category,brand,price
 2026-01-16,Second-hand reading lamp,Home & living,Etsy (vintage),35.00
 ```
 
-Imports are limited to 5,000 rows at a time. Invalid rows are skipped and reported. The app recalculates impact from the submitted category and price; any supplied emissions values are not used.
+Category names must match the factor table. Dates must use `YYYY-MM-DD` and cannot be in the future. Prices must be finite and non-negative. A supplied `co2` column is ignored.
 
-## Back up and restore
+</details>
 
-In the sidebar's **Data backup** section:
+Purchases and profile details are not sent to external shopping, support, or AI services. Keep credentials, virtual environments, browser profiles, and private data out of commits.
 
-- Download a JSON backup of your purchase ledger and wishlist.
-- Restore a compatible ShopImpact backup after confirming that restoration replaces the current ledger and wishlist.
+## Under the glass
 
-Backup files include those two data sets, but not the cart, profile, orders, support/return requests, or display preferences. Backups are limited to 5 MB and support up to 5,000 purchases and 500 wishlist items.
+| Layer | Where it lives |
+| :--- | :--- |
+| Entry point & navigation | `ShopImpactAI.py`, `shopimpact/app.py` |
+| Glass, motion & appearance tokens | `shopimpact/theme.py`, `shopimpact/assets/app.css` |
+| Reusable visual components | `shopimpact/ui.py` |
+| Purchase math & catalog | `shopimpact/logic.py`, `shopimpact/catalog.py` |
+| Local recommendation model | `shopimpact/recommendations.py` |
+| Decision lab | `shopimpact/decisions.py` |
+| Imports & snapshot backups | `shopimpact/data.py` |
+| Feature views | `shopimpact/marketplace.py`, `ledger.py`, `insights.py`, `wishlist.py` |
+| Reproducible animated cover | `tools/generate_banner.py` |
 
-Version 2 includes recorded footprint and category-baseline snapshots. They are validated as finite, non-negative numbers and preserved during restoration. Reductions are derived from baseline minus footprint. Any invalid entry rejects the entire restore, leaving the current session unchanged.
+The interface uses Streamlit and Plotly. pandas handles ledger summaries; Pillow and NumPy generate the self-hosted animated cover. There are no external image servers or API calls behind the app's artwork.
 
-Legacy version 1 backups are supported. Their recorded CO2 estimate is preserved when present. The old `green_savings` field mixed currencies and emissions, so it is discarded and the carbon reduction is recalculated from the saved footprint and category baseline.
-
-## Estimates and reductions
-
-`carbon_saved_kg = max(0, baseline_co2 - co2)`
-
-Catalog checkout records the catalog factor's estimate and category-average baseline at the time of purchase. Selecting a greener alternative when manually logging a purchase creates an explicit lower-factor scenario, capped at 0.4 kg CO2e per $10. These comparisons are assumptions for exploration, not measured reductions. Currency is used only for prices, spending, shipping, and budgets.
-
-## Development
-
-The entry point delegates to focused modules in `shopimpact/`: `catalog.py`, `logic.py`, `data.py`, `recommendations.py`, `theme.py`, `ui.py`, and the individual view modules. Shared styles are in `shopimpact/assets/app.css`.
-
-Run the regression suite:
+### Checks that follow the experience
 
 ```bash
 python -m compileall -q ShopImpactAI.py shopimpact
 python -m unittest discover -s tests -v
 ```
 
-Tests cover impact units, lossless and legacy backups, malformed imports, recommendation ranking and privacy preferences, checkout, literal purchase search, empty states, and every page in both appearances. GitHub Actions runs these checks on Python 3.10, 3.12, and 3.14.
+GitHub Actions tests Python **3.10, 3.12, and 3.14**. A separate Chrome run checks real theme switches, foreground/background contrast, dropdowns, forms, mobile layout, and reduced motion, and saves screenshots as artifacts.
 
-The README banner is a self-hosted animated GIF. Rebuild it with:
+To run the browser checks locally, install Google Chrome and the optional test dependency:
 
 ```bash
-python tools/generate_banner.py
+python -m pip install playwright
+python tests/browser_smoke.py
 ```
 
-## Deploy on Streamlit Community Cloud
+Rebuild the animated cover with `python tools/generate_banner.py`.
 
-1. Push the repository to GitHub.
-2. In [Streamlit Community Cloud](https://share.streamlit.io/), create an app from this repository.
-3. Select the `main` branch and set **Main file path** to `ShopImpactAI.py`.
-4. Deploy the app. Community Cloud installs packages from `requirements.txt`.
+---
 
-No Streamlit secrets are required for the current app. Do not add credentials or private data to the repository.
+<div align="center">
 
-## Data, privacy, and limitations
+**A little less impulse. A little more intention.**
 
-- The app stores its working data in Streamlit session state; there is no database or real user account.
-- Session data may be lost when the session ends or the app restarts. Download a backup if you want to keep your ledger and wishlist.
-- The app does not send purchases, profile details, checkout information, or support requests to external commerce or support services.
-- `.gitignore` excludes local Streamlit secrets, Python virtual environments, and Python cache files. Do not commit `.streamlit/secrets.toml`, `.venv`, `.venv-1`, or `__pycache__`.
-- The app is a prototype for exploration and is not financial, environmental, or lifecycle-assessment advice.
+Built by [sritharan-blip](https://github.com/sritharan-blip).
 
+</div>
