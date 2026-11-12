@@ -1,8 +1,21 @@
 [theme]
-base = "light"
-primaryColor = "#087F5B"
-backgroundColor = "#F3F7F4"
-secondaryBackgroundColor = "#FFFFFF"
-textColor = "#172B27"
-borderColor = "#D9E3DE"
 font = "sans-serif"
+baseRadius = "0.7rem"
+buttonRadius = "0.7rem"
+
+[theme.light]
+primaryColor = "#23694F"
+backgroundColor = "#F6F5EF"
+secondaryBackgroundColor = "#FFFEFA"
+textColor = "#172D26"
+borderColor = "#CFD7CD"
+
+[theme.dark]
+primaryColor = "#C7F28A"
+backgroundColor = "#0B1415"
+secondaryBackgroundColor = "#142121"
+textColor = "#F0F5E9"
+borderColor = "#39504A"
+
+[browser]
+gatherUsageStats = false

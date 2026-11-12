@@ -1,4 +1,19 @@
+![ShopImpact — a little more intentional](assets/shopimpact-banner.gif)
+
 # ShopImpactAI
+
+**Good choices. Better everyday.** A personal studio for shopping with more intention.
+
+## New in this edition
+
+- **Daylight & Midnight:** warm ivory and forest green, or deep ink and mint, with consistent cards, forms, tables, charts, and menus.
+- **Motion with purpose:** a floating shopping-bag hero, orbital accents, a moving inspiration strip, animated milestones, progress fills, page entrances, and responsive product illustrations.
+- **Your pace:** Reduce motion pauses decorative effects; your operating system's reduced-motion setting is also respected. High contrast is available under Display & accessibility.
+- **Smart matches:** a local content-based recommender fits TF-IDF vectors to catalog descriptions, then ranks matches using shopping intent, category, budget, and estimated reduction. Every pick explains its reasons. Profile lets you disable purchase-history personalization. This is an explainable recommendation model, not a generative assistant or a verified environmental endorsement.
+- **Consistent units:** carbon reductions use `carbon_saved_kg` and are shown in kg CO2e. They are never represented as money savings.
+- **Stable backups:** version 2 preserves recorded footprint and baseline snapshots, IDs, and wishlist dates. Restoring a catalog purchase keeps its original estimate, even if category factors later change.
+
+All commerce flows remain local demonstrations. No API key is needed.
 
 ShopImpact is a session-based Streamlit demo for conscious shopping. It helps you record purchases, explore directional carbon-impact estimates, compare alternatives, and review spending and impact trends.
 
@@ -51,7 +66,7 @@ Use Python 3.10 or later.
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-streamlit run ShopImpactAI.py
+python -m streamlit run ShopImpactAI.py
 ```
 
 ### macOS or Linux
@@ -60,7 +75,7 @@ streamlit run ShopImpactAI.py
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-streamlit run ShopImpactAI.py
+python -m streamlit run ShopImpactAI.py
 ```
 
 Streamlit prints a local URL (usually `http://localhost:8501`) when the app starts. Stop the local server with **Ctrl+C** in the terminal.
@@ -72,7 +87,7 @@ Install the project's dependencies from [`requirements.txt`](requirements.txt):
 - Streamlit — app interface and session state
 - pandas — purchase data handling and CSV import/export
 - Plotly — interactive charts
-- Pillow — generated app illustration
+- Pillow — reproducible animated README banner
 
 ## Import purchase history
 
@@ -93,7 +108,7 @@ Optional columns:
 
 | Column | Description |
 |---|---|
-| `date` | Purchase date; defaults to today if blank. Future dates are rejected. |
+| `date` | ISO purchase date (`YYYY-MM-DD`); defaults to today if blank. Future dates are rejected. |
 | `brand` | Brand or shop name |
 
 Example:
@@ -115,6 +130,35 @@ In the sidebar's **Data backup** section:
 
 Backup files include those two data sets, but not the cart, profile, orders, support/return requests, or display preferences. Backups are limited to 5 MB and support up to 5,000 purchases and 500 wishlist items.
 
+Version 2 includes recorded footprint and category-baseline snapshots. They are validated as finite, non-negative numbers and preserved during restoration. Reductions are derived from baseline minus footprint. Any invalid entry rejects the entire restore, leaving the current session unchanged.
+
+Legacy version 1 backups are supported. Their recorded CO2 estimate is preserved when present. The old `green_savings` field mixed currencies and emissions, so it is discarded and the carbon reduction is recalculated from the saved footprint and category baseline.
+
+## Estimates and reductions
+
+`carbon_saved_kg = max(0, baseline_co2 - co2)`
+
+Catalog checkout records the catalog factor's estimate and category-average baseline at the time of purchase. Selecting a greener alternative when manually logging a purchase creates an explicit lower-factor scenario, capped at 0.4 kg CO2e per $10. These comparisons are assumptions for exploration, not measured reductions. Currency is used only for prices, spending, shipping, and budgets.
+
+## Development
+
+The entry point delegates to focused modules in `shopimpact/`: `catalog.py`, `logic.py`, `data.py`, `recommendations.py`, `theme.py`, `ui.py`, and the individual view modules. Shared styles are in `shopimpact/assets/app.css`.
+
+Run the regression suite:
+
+```bash
+python -m compileall -q ShopImpactAI.py shopimpact
+python -m unittest discover -s tests -v
+```
+
+Tests cover impact units, lossless and legacy backups, malformed imports, recommendation ranking and privacy preferences, checkout, literal purchase search, empty states, and every page in both appearances. GitHub Actions runs these checks on Python 3.10, 3.12, and 3.14.
+
+The README banner is a self-hosted animated GIF. Rebuild it with:
+
+```bash
+python tools/generate_banner.py
+```
+
 ## Deploy on Streamlit Community Cloud
 
 1. Push the repository to GitHub.
@@ -131,3 +175,4 @@ No Streamlit secrets are required for the current app. Do not add credentials or
 - The app does not send purchases, profile details, checkout information, or support requests to external commerce or support services.
 - `.gitignore` excludes local Streamlit secrets, Python virtual environments, and Python cache files. Do not commit `.streamlit/secrets.toml`, `.venv`, `.venv-1`, or `__pycache__`.
 - The app is a prototype for exploration and is not financial, environmental, or lifecycle-assessment advice.
+
