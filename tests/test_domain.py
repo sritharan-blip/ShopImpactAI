@@ -137,7 +137,8 @@ class DomainTests(unittest.TestCase):
             return sum(a * b for a, b in zip(linear, [.2126, .7152, .0722]))
         for mode, palette in PALETTES.items():
             for fg, bg in [('text', 'page'), ('muted', 'page'), ('text', 'surface'),
-                           ('muted', 'surface'), ('text', 'inset'), ('accent_text', 'accent')]:
+                           ('muted', 'surface'), ('text', 'inset'), ('accent_text', 'accent'),
+                           ('impact_high', 'page'), ('impact_medium', 'page'), ('impact_low', 'page')]:
                 with self.subTest(mode=mode, foreground=fg, background=bg):
                     a, b = sorted([luminance(palette[fg]), luminance(palette[bg])])
                     self.assertGreaterEqual((b + .05) / (a + .05), 4.5)

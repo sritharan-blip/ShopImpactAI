@@ -25,7 +25,7 @@ AUDIT = r'''() => {
   const lum=a=>a.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0);
   window.auditContrast=()=>{
     const base=rgba(getComputedStyle(document.querySelector('.stApp')).backgroundColor),bad=[];
-    for(const e of document.querySelectorAll('h1,h2,h3,p,small,[role="combobox"],[role="spinbutton"],[data-testid="stMetricValue"],[style*="color:"]')){
+    for(const e of document.querySelectorAll('h1,h2,h3,p,small,.si-impact,[role="combobox"],[role="spinbutton"],[data-testid="stMetricValue"],[style*="color:"]')){
       const r=e.getBoundingClientRect();if(!r.width||!r.height||r.bottom<0||r.top>innerHeight||getComputedStyle(e).visibility==='hidden')continue;
       let fg=rgba(getComputedStyle(e).color);if(fg[3]===0)continue;
       const layers=[];for(let p=e;p;p=p.parentElement)layers.push(rgba(getComputedStyle(p).backgroundColor));

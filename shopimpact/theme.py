@@ -10,13 +10,15 @@ PALETTES = {
                 grid='#D7E2F3', glow='rgba(77,129,255,.16)', shadow='0 18px 50px -22px rgba(44,70,124,.28)',
                 glass='rgba(250,252,255,.78)', glass_strong='rgba(250,252,255,.94)',
                 glass_border='rgba(255,255,255,.92)', violet='#7450DA', mint='#117D78',
-                orb_one='rgba(78,145,255,.30)', orb_two='rgba(175,125,255,.22)', orb_three='rgba(59,211,200,.23)'),
+                orb_one='rgba(78,145,255,.30)', orb_two='rgba(175,125,255,.22)', orb_three='rgba(59,211,200,.23)',
+                impact_high='#B62039', impact_medium='#8A5A00', impact_low='#126A52'),
     True: dict(page='#070C19', surface='#111D32', inset='#192943', text='#F2F6FF', muted='#BDCBE2',
                border='#405578', accent='#80E7FF', accent_text='#071728', soft='#203B58',
                grid='#293D5B', glow='rgba(87,185,255,.15)', shadow='0 24px 60px -24px rgba(0,0,0,.70)',
                glass='rgba(17,29,50,.80)', glass_strong='rgba(17,29,50,.96)',
                glass_border='rgba(168,201,255,.23)', violet='#C5ADFF', mint='#82EAD0',
-               orb_one='rgba(49,103,230,.26)', orb_two='rgba(131,64,230,.24)', orb_three='rgba(20,164,170,.17)'),
+               orb_one='rgba(49,103,230,.26)', orb_two='rgba(131,64,230,.24)', orb_three='rgba(20,164,170,.17)',
+               impact_high='#FF9EA8', impact_medium='#FFD58A', impact_low='#82EAD0'),
 }
 
 

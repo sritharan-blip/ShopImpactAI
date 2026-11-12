@@ -82,6 +82,9 @@ input::placeholder,textarea::placeholder{color:var(--si-muted)!important;opacity
 [data-testid="stToast"] *,[data-baseweb="toast"] *{color:var(--si-text)!important}
 [data-testid="stAlert"]{background:var(--si-soft);border:1px solid var(--si-border);border-radius:16px}
 [data-testid="stAlert"] p{color:var(--si-text)}
+[role="alert"]{background:var(--si-soft)!important;color:var(--si-text)!important;border-color:var(--si-border)!important}
+[role="alert"] p,[role="alert"] small{color:var(--si-text)!important}
+.si-impact{font-weight:700}.si-impact-high{color:var(--si-impact-high)}.si-impact-medium{color:var(--si-impact-medium)}.si-impact-low,.si-impact-very-low{color:var(--si-impact-low)}
 [data-testid="stCheckbox"] *,[data-testid="stToggle"] *,[data-testid="stSlider"] [data-testid="stMarkdownContainer"]{color:var(--si-text)}
 input[type="checkbox"],input[type="radio"]{accent-color:var(--si-accent)}
 /* Navigation reads like a floating dock rather than a settings form. */
