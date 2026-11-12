@@ -27,8 +27,10 @@ AUDIT = r'''() => {
     const base=rgba(getComputedStyle(document.querySelector('.stApp')).backgroundColor),bad=[];
     for(const e of document.querySelectorAll('h1,h2,h3,p,small,.si-impact,[role="combobox"],[role="spinbutton"],[data-testid="stMetricValue"],[style*="color:"]')){
       const r=e.getBoundingClientRect();if(!r.width||!r.height||r.bottom<0||r.top>innerHeight||getComputedStyle(e).visibility==='hidden')continue;
+      if(e.closest('button:disabled,[aria-disabled="true"]'))continue;
       let fg=rgba(getComputedStyle(e).color);if(fg[3]===0)continue;
-      const layers=[];for(let p=e;p;p=p.parentElement)layers.push(rgba(getComputedStyle(p).backgroundColor));
+      const layers=[];let opacity=1;for(let p=e;p;p=p.parentElement){const s=getComputedStyle(p);layers.push(rgba(s.backgroundColor));opacity*=+s.opacity;}
+      if(opacity===0)continue;fg[3]*=opacity;
       let bg=base.slice(0,3);for(const layer of layers.reverse())bg=over(layer,bg);
       fg=over(fg,bg);const a=lum(fg),b=lum(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
       const large=(parseFloat(getComputedStyle(e).fontSize)>=24),minimum=large?3:4.5;
@@ -123,6 +125,8 @@ try:
         page.get_by_text('Saved. Revisit on', exact=False).wait_for()
         healthy(page)
         assert not page.evaluate('window.auditContrast()'), page.evaluate('window.auditContrast()')
+        caption = page.get_by_text('Explore cost per use, check your budget, and give a purchase time before you decide.', exact=True)
+        print('CAPTION:' + json.dumps(caption.evaluate('e=>{const a=[];for(let p=e;p&&a.length<5;p=p.parentElement){const s=getComputedStyle(p);a.push({tag:p.tagName,testid:p.dataset.testid,color:s.color,opacity:s.opacity});}return a;}')), flush=True)
         capture(page, 'decision-lab')
         sidebar.get_by_text('Overview', exact=True).click()
         page.locator('.si-hero').wait_for()
