@@ -25,7 +25,7 @@ AUDIT = r'''() => {
   const lum=a=>a.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0);
   window.auditContrast=()=>{
     const base=rgba(getComputedStyle(document.querySelector('.stApp')).backgroundColor),bad=[];
-    for(const e of document.querySelectorAll('h1,h2,h3,p,[role="combobox"],[role="spinbutton"],[data-testid="stMetricValue"],[style*="color:"]')){
+    for(const e of document.querySelectorAll('h1,h2,h3,p,small,[role="combobox"],[role="spinbutton"],[data-testid="stMetricValue"],[style*="color:"]')){
       const r=e.getBoundingClientRect();if(!r.width||!r.height||r.bottom<0||r.top>innerHeight||getComputedStyle(e).visibility==='hidden')continue;
       let fg=rgba(getComputedStyle(e).color);if(fg[3]===0)continue;
       const layers=[];for(let p=e;p;p=p.parentElement)layers.push(rgba(getComputedStyle(p).backgroundColor));
@@ -100,6 +100,7 @@ try:
         page.get_by_text('Discover products', exact=True).click()
         page.get_by_text('Your smart matches', exact=True).wait_for()
         healthy(page)
+        assert not page.evaluate('window.auditContrast()'), page.evaluate('window.auditContrast()')
         capture(page, 'midnight-discover')
         sidebar = page.locator('[data-testid="stSidebar"]')
         sidebar.get_by_text('Log a purchase', exact=True).click()
@@ -116,9 +117,12 @@ try:
         sidebar.get_by_text('Decision lab', exact=True).click()
         page.get_by_text('A little pause. A better decision.', exact=True).wait_for()
         page.get_by_role('textbox', name='What caught your eye?', exact=True).fill('A useful jacket')
+        page.get_by_role('combobox', name='Purchase category', exact=True).click()
+        page.get_by_role('option', name='Sustainable apparel / second-hand', exact=True).click()
         page.get_by_role('button', name='Save a pause plan', exact=True).click()
         page.get_by_text('Saved. Revisit on', exact=False).wait_for()
         healthy(page)
+        assert not page.evaluate('window.auditContrast()'), page.evaluate('window.auditContrast()')
         capture(page, 'decision-lab')
         sidebar.get_by_text('Overview', exact=True).click()
         page.locator('.si-hero').wait_for()
@@ -130,6 +134,12 @@ try:
         healthy(page)
         width = page.evaluate('({viewport:innerWidth,document:document.documentElement.scrollWidth})')
         assert width['document'] <= width['viewport'] + 2, width
+        hidden_values = page.locator('.si-hero-art').evaluate('''root=>{
+          const cards=[...root.querySelectorAll('.si-float-card')],bad=[];
+          cards.forEach((card,i)=>{const a=card.querySelector('strong').getBoundingClientRect();
+            cards.slice(i+1).forEach(other=>{const b=other.getBoundingClientRect();
+              if(Math.min(a.right,b.right)>Math.max(a.left,b.left)+2&&Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top)+2)bad.push(card.textContent);});});return bad;}''')
+        assert not hidden_values, hidden_values
         capture(page, 'mobile-midnight')
         page.emulate_media(reduced_motion='reduce')
         assert page.locator('.si-sphere').evaluate('(e)=>getComputedStyle(e).animationName') == 'none'

@@ -30,7 +30,7 @@ def render_decision_lab(purchases: list[dict]) -> None:
     st.caption('Explore cost per use, check your budget, and give a purchase time before you decide.')
     left, right = st.columns([1.1, 1], gap='large')
     with left:
-        with st.container(border=True):
+        with st.container(border=True, key='decision_assumptions'):
             product = st.text_input('What caught your eye?', placeholder='A jacket. Headphones. Something you will actually use.', key='decision_product', max_chars=150)
             category = st.selectbox('Purchase category', list(CATEGORIES), key='decision_category')
             price = st.number_input('Expected price ($)', min_value=.01, max_value=100000.0, value=120.0, step=5.0, key='decision_price')
@@ -53,7 +53,7 @@ def render_decision_lab(purchases: list[dict]) -> None:
             st.warning('This would take your recorded spending above your monthly budget.')
         else:
             st.caption('A budget fit is one signal. Check whether you already own something that does the job.')
-    with st.container(border=True):
+    with st.container(border=True, key='decision_pause_panel'):
         st.markdown('### Let the impulse settle.')
         st.caption('Save this idea to your wishlist and choose when to revisit it. This sets a date in the app; it does not send a notification.')
         pause = st.segmented_control('Give it some space', ['24 hours', '3 days', '1 week'], default='3 days', key='decision_pause')
