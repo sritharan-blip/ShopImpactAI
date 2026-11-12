@@ -59,14 +59,16 @@ input::placeholder,textarea::placeholder {color:var(--si-muted)!important;opacit
 [data-baseweb="input"]:focus-within,[data-baseweb="select"]:focus-within > div {border-color:var(--si-accent)!important;box-shadow:0 0 0 2px var(--si-soft)}
 [data-testid="stNumberInput"] button {background:var(--si-inset)!important;color:var(--si-text)!important}
 [data-baseweb="select"] svg,[data-testid="stExpander"] svg,[data-testid="stSidebar"] svg {fill:currentColor;color:var(--si-muted)}
-[data-testid="stSelectbox"] [role="combobox"],[data-testid="stMultiSelect"] [role="combobox"],
+[data-testid="stSelectbox"] [role="combobox"],[data-testid="stSelectbox"] button,
+[data-testid="stMultiSelect"] [role="combobox"],[data-testid="stMultiSelect"] button,
 [data-testid="stDateInput"] input,[data-testid="stDateInput"] button,
 [data-testid="stDateInputField"],
 [data-testid="stDateInput"] div:has(> input) {
   background:var(--si-inset)!important;color:var(--si-text)!important;border-color:var(--si-border)!important
 }
 [data-testid="stSelectbox"] [role="combobox"] *,[data-testid="stMultiSelect"] [role="combobox"] *,
-[data-testid="stDateInput"] button * {color:var(--si-text)!important}
+[data-testid="stSelectbox"] button *,[data-testid="stMultiSelect"] button *,
+[data-testid="stDateInputField"] *,[data-testid="stDateInput"] button * {color:var(--si-text)!important}
 [role="listbox"],[role="listbox"] [role="option"],[role="dialog"],
 [role="dialog"] [role="grid"],[role="dialog"] [role="gridcell"] {
   background:var(--si-surface)!important;color:var(--si-text)!important;border-color:var(--si-border)!important
