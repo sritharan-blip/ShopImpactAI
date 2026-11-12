@@ -91,11 +91,11 @@ try:
         capture(page, 'midnight-form')
         page.locator('[data-testid="stSidebar"]').get_by_text('Overview', exact=True).click()
         page.locator('.si-hero').wait_for()
-        page.set_viewport_size({'width': 390, 'height': 844})
-        # Streamlit may collapse the sidebar at this width; close it if still open.
+        # Close at desktop width before the responsive layout can remove the button.
         close_sidebar = page.locator('[data-testid="stSidebarCollapseButton"] button')
         if close_sidebar.count() and close_sidebar.is_visible():
             close_sidebar.click()
+        page.set_viewport_size({'width': 390, 'height': 844})
         page.wait_for_timeout(300)
         assert_no_errors(page)
         width = page.evaluate('({viewport:innerWidth,document:document.documentElement.scrollWidth})')
