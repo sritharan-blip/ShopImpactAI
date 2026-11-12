@@ -23,6 +23,22 @@ A personal impact studio for the space between **wanting something** and **choos
 
 Track what you spend. Explore your estimated footprint. Find products that fit your intent. Take a breath before the next purchase.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/screenshots/midnight-overview.jpg">
+  <img src="assets/screenshots/daylight-overview.jpg" alt="ShopImpact's liquid-glass dashboard with its monthly snapshot, floating data cards, and animated orb" width="100%">
+</picture>
+
+<p align="center"><sub>Actual Chrome captures with the demo ledger. Daylight clarity. Midnight atmosphere.</sub></p>
+
+<details>
+<summary><strong>Explore Midnight and Decision lab</strong></summary>
+
+![Midnight dashboard](assets/screenshots/midnight-overview.jpg)
+
+![Decision lab with cost-per-use analysis, budget fit, and a saved purchase pause plan](assets/screenshots/decision-lab.jpg)
+
+</details>
+
 | A clearer view | What you can do |
 | :--- | :--- |
 | **Liquid glass, two ways** | Frosted layers, moving aurora light, floating data cards, luminous edges, and a coordinated Daylight / Midnight palette. |
