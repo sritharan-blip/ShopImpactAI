@@ -5,6 +5,7 @@ artifacts; small encoded previews make remote visual review possible as well.
 """
 import base64
 import io
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -20,6 +21,7 @@ OUTPUT.mkdir(exist_ok=True)
 
 
 def capture(page, name):
+    page.evaluate("window.scrollTo(0,0); document.querySelector('[data-testid=\"stMain\"]')?.scrollTo(0,0)")
     raw = page.screenshot(path=str(OUTPUT / (name + '.png')), animations='disabled')
     image = Image.open(io.BytesIO(raw)).convert('RGB')
     image.thumbnail((1100, 900))
@@ -52,22 +54,23 @@ try:
         page.locator('.si-hero').wait_for()
         page.get_by_role('button', name='Load demo data', exact=True).click()
         page.locator('.si-hero small').filter(has_text='9 purchases').wait_for()
+        page.wait_for_function("document.querySelector('.si-hero-art img')?.naturalWidth > 0")
         assert_no_errors(page)
+        print('CONTROLS:' + json.dumps(page.locator('button').evaluate_all('(buttons)=>buttons.filter(b=>b.textContent.includes("Midnight")||b.textContent.includes("Daylight")).map(b=>({text:b.textContent,testid:b.dataset.testid,role:b.getAttribute("role"),html:b.outerHTML.slice(0,1000)}))')), flush=True)
         capture(page, 'daylight-overview')
-        modes = page.locator('[data-testid="stButtonGroup"]')
-        modes.get_by_role('button', name='Midnight', exact=True).click()
+        page.get_by_text('Midnight', exact=True).click()
         page.wait_for_function("getComputedStyle(document.documentElement).getPropertyValue('--si-page').trim() === '#0B1415'")
         assert_no_errors(page)
         capture(page, 'midnight-overview')
-        page.get_by_label('Navigate ShopImpact').get_by_text('Discover products', exact=True).click()
+        page.get_by_text('Discover products', exact=True).click()
         page.get_by_text('Your smart matches', exact=True).wait_for()
         assert_no_errors(page)
         capture(page, 'midnight-discover')
-        page.get_by_label('Navigate ShopImpact').get_by_text('Log a purchase', exact=True).click()
+        page.locator('[data-testid="stSidebar"]').get_by_text('Log a purchase', exact=True).click()
         page.get_by_role('textbox', name='Product', exact=True).wait_for()
         assert_no_errors(page)
         capture(page, 'midnight-form')
-        page.get_by_label('Navigate ShopImpact').get_by_text('Overview', exact=True).click()
+        page.locator('[data-testid="stSidebar"]').get_by_text('Overview', exact=True).click()
         page.locator('.si-hero').wait_for()
         page.set_viewport_size({'width': 390, 'height': 844})
         # Streamlit may collapse the sidebar at this width; close it if still open.
@@ -80,7 +83,7 @@ try:
         assert width['document'] <= width['viewport'] + 2, width
         capture(page, 'mobile-midnight')
         page.emulate_media(reduced_motion='reduce')
-        motion = page.locator('.si-bag').evaluate('(e) => getComputedStyle(e).animationName')
+        motion = page.locator('.si-marquee-track').evaluate('(e) => getComputedStyle(e).animationName')
         assert motion == 'none', motion
         browser.close()
     print('Real Chrome checks passed: themes, catalog, form, mobile, reduced motion.', flush=True)

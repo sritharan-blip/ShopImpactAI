@@ -2,13 +2,38 @@
 from __future__ import annotations
 
 from datetime import date
+import base64
 import html
+import re
 import pandas as pd
 import streamlit as st
+from .theme import PALETTES
+
+
+def _illustrated_html(markup: str) -> None:
+    """Streamlit sanitizes inline SVG; self-contained SVG images retain artwork."""
+    palette = PALETTES[st.session_state.get('dark_mode', False)]
+    motion = '''.si-orbit{transform-origin:180px 150px;animation:orbit 45s linear infinite}
+    .si-bag{animation:float 6s ease-in-out infinite}.si-orbit-card{animation:float 5s ease-in-out infinite}
+    @keyframes orbit{to{transform:rotate(360deg)}}@keyframes float{50%{transform:translateY(-8px)}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important}}'''
+    if st.session_state.get('reduce_motion', False):
+        motion = '*{animation:none!important}'
+    def encode(match):
+        vector = match.group()
+        for key, value in palette.items():
+            vector = vector.replace(f'var(--si-{key.replace("_", "-")})', value)
+        vector = vector.replace('currentColor', palette['accent'])
+        if 'xmlns=' not in vector:
+            vector = vector.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ', 1)
+        vector = vector.replace('>', f'><style>{motion}</style>', 1)
+        data = base64.b64encode(vector.encode()).decode()
+        return f'<img alt="" aria-hidden="true" src="data:image/svg+xml;base64,{data}">'
+    st.html(re.sub(r'<svg\b.*?</svg>', encode, markup, flags=re.S))
 
 
 def render_hero(count: int) -> None:
-    st.html(f'''<section class="si-hero" aria-label="ShopImpact dashboard introduction">
+    _illustrated_html(f'''<section class="si-hero" aria-label="ShopImpact dashboard introduction">
       <div><span class="si-status">A LITTLE MORE INTENTIONAL</span>
       <h1>Good choices.<br><em>Better everyday.</em></h1>
       <p>Know what you spend. Explore your footprint.<br>Find more meaning in what you bring home.</p>
@@ -51,7 +76,7 @@ ART = {
 
 def product_art(icon: str) -> None:
     geometry = ART.get(icon, ART['shopping_bag'])
-    st.html(f'<div class="si-product-art" aria-hidden="true"><svg viewBox="0 0 100 90" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">{geometry}</svg></div>')
+    _illustrated_html(f'<div class="si-product-art" aria-hidden="true"><svg viewBox="0 0 100 90" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">{geometry}</svg></div>')
 
 
 def render_table(data, hide_index=True, column_config=None, alt='Data table', **kwargs) -> None:
