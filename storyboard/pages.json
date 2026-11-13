@@ -532,19 +532,19 @@
     "points": [
       [
         "COORDINATED APPEARANCE",
-        "The palette is applied before controls render. CSS variables update text and backgrounds together; inline theme-dependent impact colors were removed."
+        "The palette is applied before controls render. Shared CSS variables update text and backgrounds together."
       ],
       [
         "READABLE RERUNS",
-        "Captions stay opaque and stale-content dimming is suppressed, preventing the brief low-contrast state during a theme change."
+        "Captions stay opaque. Stale-content dimming is suppressed to prevent a brief low-contrast state during theme changes."
       ],
       [
         "USER CONTROL",
-        "Reduce motion pauses decoration and transitions; the operating-system preference is respected. High contrast strengthens text and borders."
+        "Reduce motion pauses decoration and transitions, including when requested by the operating system. High contrast strengthens text and borders."
       ],
       [
         "RESPONSIVE LAYOUT",
-        "The mobile layout stacks controls, resizes the glass scene and keeps floating card values from covering one another."
+        "On mobile, controls stack and the glass scene resizes. Floating card values keep their own space."
       ]
     ],
     "source": "shopimpact/theme.py"

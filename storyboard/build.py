@@ -173,14 +173,15 @@ for n,page in enumerate(PAGES,1):
         sections=[("USER ACTION","action"),("SYSTEM RESPONSE","response"),("BEHIND THE SCREEN","backend")]
         font_size=17.0
         while True:
-            heights=[.78+lines_needed(page[k],3.95,font_size)*font_size*1.27/72 for _,k in sections]
-            if sum(heights)+.20<=5.65 or font_size<=15.5:break
+            heights=[.70+lines_needed(page[k],3.95,font_size)*font_size*1.20/72 for _,k in sections]
+            if sum(heights)+.20<=5.65:break
+            assert font_size>12.5, (page["title"], heights)
             font_size-=.5
         yy=2.12
         for (label,key),hh in zip(sections,heights):
             box(s,10.85,yy,4.5,hh,WHITE,LINE,.08)
             tx(s,label,11.09,yy+.18,4.02,.25,11.5,BLUE,True)
-            tx(s,page[key],11.09,yy+.55,4.02,hh-.65,font_size,INK)
+            tx(s,page[key],11.09,yy+.50,4.02,hh-.58,font_size,INK)
             yy+=hh+.10
         marks=info["marks"][:2]
         legend="   /   ".join(str(m["n"])+" "+m["label"] for m in marks) or "Task capture: "+page["image"].replace("_"," ")
