@@ -1,0 +1,652 @@
+[
+  {
+    "type": "cover",
+    "title": "ShopImpactAI",
+    "subtitle": "Application storyboard",
+    "strap": "A clearer view of the user journey, the interface and the Python behind it.",
+    "author": "SRITHARAN N S",
+    "image": "overview_dark"
+  },
+  {
+    "type": "context",
+    "title": "The problem the app is designed to address",
+    "subtitle": "From impulse buying to a more deliberate shopping decision.",
+    "cards": [
+      [
+        "THE PROBLEM",
+        "Spending, product choices and environmental assumptions are often considered separately. A shopper can lose track of the cumulative effect of small purchases."
+      ],
+      [
+        "THE USER",
+        "A student or everyday shopper who wants to review spending, compare options and pause before buying. The storyboard uses Maya, a fictional demonstration user."
+      ],
+      [
+        "THE AIM",
+        "Bring the purchase ledger, directional impact estimates, product discovery, a wishlist and decision support into one understandable workflow."
+      ],
+      [
+        "THE PRODUCT BOUNDARY",
+        "This is a working Streamlit prototype. Commerce, ratings, stock, payments, order tracking, returns and support are illustrative; no real transaction is sent."
+      ]
+    ],
+    "source": "README.md"
+  },
+  {
+    "type": "journey",
+    "title": "Two connected journeys, one app",
+    "subtitle": "The main route supports reflection; an optional route demonstrates commerce.",
+    "main": [
+      "01 / Review the dashboard",
+      "02 / Describe a need",
+      "03 / Test a $120 jacket",
+      "04 / Save a pause plan",
+      "05 / Log and review purchases"
+    ],
+    "branch": [
+      "A / Reflection route",
+      "Wishlist → ledger → analytics → swaps → rewards",
+      "B / Commerce demonstration",
+      "Local profile → product details → cart → demo order → help"
+    ],
+    "note": "The commerce route uses a separate synthetic session. Screens are task evidence, not one continuous real account statement.",
+    "source": "shopimpact/app.py"
+  },
+  {
+    "type": "architecture",
+    "title": "What “backend” means in this prototype",
+    "subtitle": "Python handles state and calculations; Streamlit carries the interaction between browser and server.",
+    "nodes": [
+      [
+        "BROWSER",
+        "Controls, forms, charts and screenshots the user sees."
+      ],
+      [
+        "STREAMLIT RUNTIME",
+        "Reruns main() after interactions and renders the selected view."
+      ],
+      [
+        "SESSION STATE",
+        "purchases, wishlist, cart, orders, profile and UI preferences."
+      ],
+      [
+        "PURE APP LOGIC",
+        "Impact math, summaries, decision arithmetic and content ranking."
+      ],
+      [
+        "PORTABLE FILES",
+        "CSV import/export and validated JSON snapshots."
+      ]
+    ],
+    "note": "There is no separate custom REST service, database, authentication provider or payment gateway. If the app is hosted, the Python runtime and session memory are on that host, not exclusively on the user's device.",
+    "source": "shopimpact/app.py"
+  },
+  {
+    "type": "scene",
+    "scene": "01",
+    "route": "A / START",
+    "title": "Orient the user with a monthly snapshot",
+    "image": "overview_day",
+    "goal": "Maya wants to understand the current shopping position before considering another purchase.",
+    "action": "Open Overview and load the built-in demo ledger. Review spend, estimated footprint, low-impact choices and the eco score.",
+    "response": "The dashboard summarises the current month and shows goals, a six-month trend and recent activity. Floating cards use the same session data.",
+    "backend": "_purchase_frame() and _monthly_frame() prepare the ledger. _render_overview() computes totals and the score, then builds the Plotly chart.",
+    "look": [
+      "Monthly spending and footprint cards",
+      "Direct action buttons into the workflow"
+    ],
+    "source": "shopimpact/insights.py",
+    "function": "_render_overview"
+  },
+  {
+    "type": "scene",
+    "scene": "02",
+    "route": "A / DISCOVER",
+    "title": "Turn a shopping intention into relevant matches",
+    "image": "discover",
+    "goal": "Maya wants options that fit a clear need rather than browsing without a purpose.",
+    "action": "Enter a phrase such as “repairable laptop for studying”. Adjust category and maximum budget; open the explanation behind the matches.",
+    "response": "The app displays in-stock catalog matches with prices, directional estimates and human-readable reasons. No match is returned if hard filters exclude everything.",
+    "backend": "recommend_products() ranks the fixed demo catalog. The Profile preference controls whether recent ledger descriptions may personalise a blank query.",
+    "look": [
+      "Intent input and hard filters",
+      "Reasons accompanying each match"
+    ],
+    "source": "shopimpact/recommendations.py",
+    "function": "recommend_products"
+  },
+  {
+    "type": "engine",
+    "title": "Inside the recommendation engine",
+    "subtitle": "A small, explainable content model—not an LLM, neural network or live product search.",
+    "steps": [
+      [
+        "1 / Describe each item",
+        "Combine name, category, tagline, description, materials and repairability from the fixed catalog."
+      ],
+      [
+        "2 / Build TF-IDF vectors",
+        "Tokenise lowercase words, remove common stopwords, weight rare terms more highly and normalise the vectors."
+      ],
+      [
+        "3 / Form the query",
+        "Use the typed intent; when blank and permitted, use descriptions from up to 20 recent purchases."
+      ],
+      [
+        "4 / Apply hard filters",
+        "Exclude out-of-stock items, items outside the chosen category and items above the maximum budget."
+      ],
+      [
+        "5 / Rank the survivors",
+        "Combine text similarity, category affinity and the estimated reduction relative to that category's factor."
+      ],
+      [
+        "6 / Explain the result",
+        "Return reasons such as intent match, category fit and budget fit. Scores are ranking weights, not confidence probabilities."
+      ]
+    ],
+    "formula": "score = 0.65 × cosine similarity + 0.20 × category affinity + 0.15 × estimated reduction",
+    "note": "Catalog vectors are cached with lru_cache. The cache contains catalog data, not personal purchase histories. Turning history personalisation off sets the history used for ranking to an empty list.",
+    "source": "shopimpact/recommendations.py"
+  },
+  {
+    "type": "scene",
+    "scene": "03",
+    "route": "A / REFLECT",
+    "title": "Test the idea before committing to it",
+    "image": "decision",
+    "goal": "Maya is considering a $120 jacket and wants to check whether it is useful and affordable.",
+    "action": "Name the item, choose its category, set expected price, weekly uses and years kept. Review the result and select a pause interval.",
+    "response": "At three uses per week for two years, the assumption gives 312 uses and about $0.38 per use. The app also shows the budget position after buying.",
+    "backend": "decision_projection() calculates price ÷ (uses/week × 52 × years). Budget remaining is monthly budget − recorded monthly spending − proposed price.",
+    "look": [
+      "Editable usage assumptions",
+      "Cost-per-use and budget result"
+    ],
+    "source": "shopimpact/decisions.py",
+    "function": "decision_projection"
+  },
+  {
+    "type": "scene",
+    "scene": "04",
+    "route": "A / PAUSE",
+    "title": "Make the decision reversible with a wishlist",
+    "image": "wishlist",
+    "goal": "Maya wants time to think without losing the details of the jacket.",
+    "action": "Save a pause plan in Decision lab, then open Wishlist. Revisit the item on the selected date, change its priority or remove it.",
+    "response": "The idea is stored with its expected price, category, note, Need/Want priority and revisit date. It does not increase purchase totals.",
+    "backend": "_new_wishlist_item() creates an ID and a category estimate. The item is appended to st.session_state.wishlist. The revisit date is displayed in-app; no notification is sent.",
+    "look": [
+      "Saved product idea",
+      "Revisit planning and separate wishlist totals"
+    ],
+    "source": "shopimpact/wishlist.py",
+    "function": "_render_wishlist"
+  },
+  {
+    "type": "scene",
+    "scene": "05",
+    "route": "A / RECORD",
+    "title": "Record an existing purchase with an explicit scenario",
+    "image": "log",
+    "goal": "Maya wants an already-made purchase to be reflected in the ledger.",
+    "action": "Enter a product, exact category, brand/shop, price and purchase date. The capture records $100 of refurbished headphones with the greener-scenario box selected.",
+    "response": "The app previews the estimate, validates the entry and appends it to Recent purchases. Search and removal operate on the session ledger.",
+    "backend": "_new_purchase() records date, ID, price, footprint and baseline snapshot. The greener checkbox uses an assumed lower factor; it is not proof of a measured reduction.",
+    "look": [
+      "Purchase fields and date",
+      "Scenario choice and save action"
+    ],
+    "source": "shopimpact/ledger.py",
+    "function": "_render_purchase_view"
+  },
+  {
+    "type": "math",
+    "title": "Trace one purchase from input to stored record",
+    "subtitle": "Worked example: a $100 Electronics purchase with the greener scenario selected.",
+    "equations": [
+      [
+        "CATEGORY BASELINE",
+        "3.5 kg CO2e per $10 × $100 ÷ 10",
+        "35.00 kg CO2e"
+      ],
+      [
+        "ASSUMED SCENARIO",
+        "0.4 kg CO2e per $10 × $100 ÷ 10",
+        "4.00 kg CO2e"
+      ],
+      [
+        "ESTIMATED REDUCTION",
+        "max(0, 35.00 − 4.00)",
+        "31.00 kg CO2e"
+      ]
+    ],
+    "record": [
+      [
+        "id",
+        "Generated unique identifier"
+      ],
+      [
+        "price",
+        "100.00"
+      ],
+      [
+        "co2",
+        "4.00"
+      ],
+      [
+        "baseline_co2",
+        "35.00"
+      ],
+      [
+        "carbon_saved_kg",
+        "31.00"
+      ],
+      [
+        "estimate_method",
+        "snapshot-v1"
+      ]
+    ],
+    "note": "Carbon reduction is stored in kilograms, never dollars. Category factors are broad illustrative assumptions. This example is arithmetic within the prototype, not an independently verified product lifecycle result.",
+    "source": "shopimpact/logic.py",
+    "function": "_new_purchase"
+  },
+  {
+    "type": "scene",
+    "scene": "06",
+    "route": "A / REVIEW",
+    "title": "Make the effect of the ledger visible",
+    "image": "analytics",
+    "goal": "Maya wants to see how recorded purchases affect spending and the estimated footprint.",
+    "action": "Open Impact analytics and compare the month-to-date figures, the previous month's comparable days, category mix and pacing signals.",
+    "response": "The app aggregates current ledger entries into metrics and charts. A month-end projection extends the average daily pace so far; it is not a prediction of future purchases.",
+    "backend": "pandas groups dated records. _month_end_forecast() and _month_end_spend_forecast() use elapsed days, days in month and remaining goals to calculate pacing values.",
+    "look": [
+      "Ledger-driven totals",
+      "Comparison and pace signals"
+    ],
+    "source": "shopimpact/insights.py",
+    "function": "_render_analytics"
+  },
+  {
+    "type": "scene",
+    "scene": "07",
+    "route": "A / COMPARE",
+    "title": "Explore a lower-factor alternative",
+    "image": "swaps",
+    "goal": "Maya wants to understand the difference an alternative might make at the same spend.",
+    "action": "Choose a category, expected spend and quantity. Add scenarios to a comparison basket or save suggested places to a shortlist.",
+    "response": "For $80 of Electronics, the baseline is 28.0 kg and the assumed 0.4 factor gives 3.2 kg: a possible 24.8 kg difference at quantity one.",
+    "backend": "calculate_impact() supplies the baseline. get_alternatives() uses category rules and predefined brand suggestions. Basket values multiply the scenario by quantity.",
+    "look": [
+      "Scenario inputs",
+      "Baseline, alternative and estimated difference"
+    ],
+    "source": "shopimpact/insights.py",
+    "function": "_render_swap_studio"
+  },
+  {
+    "type": "scene",
+    "scene": "08",
+    "route": "A / REINFORCE",
+    "title": "Provide progress feedback without real-world rewards",
+    "image": "rewards",
+    "goal": "Maya wants encouragement to keep recording and reviewing choices.",
+    "action": "Open Eco rewards, check the weekly low-impact challenge, earned milestones and progress bars, and browse the next eco tip.",
+    "response": "Badges and a level are derived from the ledger. The app does not issue money, a verified offset or a real shopping reward.",
+    "backend": "check_badges() evaluates purchase count, category-based low-impact count, current-month footprint and estimated carbon reductions. The weekly challenge uses a Monday-to-Sunday window.",
+    "look": [
+      "Weekly challenge",
+      "Milestones and recorded progress"
+    ],
+    "source": "shopimpact/logic.py",
+    "function": "check_badges"
+  },
+  {
+    "type": "scene",
+    "scene": "09",
+    "route": "B / OPTIONAL COMMERCE DEMO",
+    "title": "Set up a session profile and a privacy preference",
+    "image": "profile",
+    "goal": "A separate demonstration session needs a profile before trying checkout.",
+    "action": "Enter the synthetic name Maya Demo and maya@example.com. Choose whether purchase history may personalise local recommendations.",
+    "response": "The profile becomes available to checkout and support forms in this session. It is not a real registered account and has no password.",
+    "backend": "_render_profile() validates a non-blank name and basic email structure, then stores name, email and personalisation in st.session_state.profile.",
+    "look": [
+      "Synthetic profile details",
+      "History-personalisation control"
+    ],
+    "source": "shopimpact/marketplace.py",
+    "function": "_render_profile"
+  },
+  {
+    "type": "scene",
+    "scene": "10",
+    "route": "B / PRODUCT DETAIL",
+    "title": "Inspect a product before adding it to the cart",
+    "image": "product_details",
+    "goal": "The demonstration user wants to inspect the refurbished-phone example and compare its assumptions.",
+    "action": "Open Product details. Review materials, care, repairability, demo availability, unit price and footprint; choose quantity two.",
+    "response": "The detail panel compares the catalog factor with the category baseline. Adding to cart increases the selected quantity, capped at the item's demo stock.",
+    "backend": "_find_product() looks up the fixed product ID. _product_impact() applies its demo factor. The cart is a mapping of product IDs to quantities.",
+    "look": [
+      "Product comparison",
+      "Quantity and add-to-cart controls"
+    ],
+    "source": "shopimpact/marketplace.py",
+    "function": "_render_catalog"
+  },
+  {
+    "type": "scene",
+    "scene": "11",
+    "route": "B / CHECKOUT",
+    "title": "Show totals and require a clear demo acknowledgement",
+    "image": "cart",
+    "goal": "The user wants to verify quantities and totals before trying the simulated checkout.",
+    "action": "Review the two-phone cart, enter a synthetic city/postal code and acknowledge that the order is non-binding. No card number is requested.",
+    "response": "At $329 each, subtotal and total are $658 with free illustrative shipping. Without a profile, checkout sends the user to Profile; missing fields or acknowledgement produce an error.",
+    "backend": "_cart_totals() calculates lines, footprint and shipping. Shipping is $4.95 below $75 for a non-empty cart, otherwise zero. Validation happens before the order records are built.",
+    "look": [
+      "Quantity and price line",
+      "Demo acknowledgement and submit"
+    ],
+    "source": "shopimpact/marketplace.py",
+    "function": "_render_cart"
+  },
+  {
+    "type": "scene",
+    "scene": "12",
+    "route": "B / CONFIRM",
+    "title": "Represent the order as an explicit local record",
+    "image": "orders",
+    "goal": "The user wants confirmation of what the prototype saved.",
+    "action": "Open the newly-created order and inspect items, totals and status. Use the advance button to demonstrate the next tracking stage.",
+    "response": "The order is marked as a demo. Status changes are manual simulations; no warehouse, carrier or payment provider is contacted.",
+    "backend": "The order stores an ID, date, synthetic delivery details, item lines, totals and status index. 'Advance demo' updates the index through Order placed, Preparing, In transit and Delivered.",
+    "look": [
+      "Demo status",
+      "Manual status-advance action"
+    ],
+    "source": "shopimpact/marketplace.py",
+    "function": "_render_orders"
+  },
+  {
+    "type": "checkout",
+    "title": "Follow the checkout state changes",
+    "subtitle": "A coordinated update to session objects—not a database transaction or payment API.",
+    "steps": [
+      [
+        "1 / Validate",
+        "Require profile, city, postal code and demo acknowledgement. Recalculate the cart totals."
+      ],
+      [
+        "2 / Build item lines",
+        "For each valid product ID, derive quantity, line price and the catalog-factor footprint."
+      ],
+      [
+        "3 / Append the ledger",
+        "Create a purchase snapshot per line, including the category baseline and derived reduction."
+      ],
+      [
+        "4 / Save the order",
+        "Insert the order into the session list with status index zero and its item lines."
+      ],
+      [
+        "5 / Clear and navigate",
+        "Replace cart with an empty mapping, set the pending view to My orders and rerun."
+      ]
+    ],
+    "facts": [
+      [
+        "Two phones",
+        "$329 × 2 = $658"
+      ],
+      [
+        "Recorded footprint",
+        "329 × 1.55 ÷ 10 × 2 = 101.99 kg"
+      ],
+      [
+        "Category baseline",
+        "658 × 3.5 ÷ 10 = 230.30 kg"
+      ],
+      [
+        "Estimated reduction",
+        "230.30 − 101.99 = 128.31 kg"
+      ]
+    ],
+    "note": "The footprint uses the catalog's illustrative factor. Rounding is applied to the recorded line. There is no payment settlement, inventory reservation service or database rollback mechanism.",
+    "source": "shopimpact/marketplace.py",
+    "function": "_render_cart"
+  },
+  {
+    "type": "scene",
+    "scene": "13",
+    "route": "B / AFTERCARE",
+    "title": "Try a return request without claiming a real refund",
+    "image": "returns",
+    "goal": "The demonstration user wants to explore aftercare for an order item.",
+    "action": "Choose an order and item, select Return or Exchange, choose a reason and optionally add a note. Submit Create demo request.",
+    "response": "The app displays a generated request ID and a clear notice that the request has not been sent to a retailer.",
+    "backend": "A return-request dictionary is appended to st.session_state.return_requests. This records the request only; it does not process a refund or automatically reverse ledger totals.",
+    "look": [
+      "Return/exchange choice",
+      "Local request confirmation"
+    ],
+    "source": "shopimpact/marketplace.py",
+    "function": "_render_help_and_returns"
+  },
+  {
+    "type": "scene",
+    "scene": "14",
+    "route": "B / SUPPORT",
+    "title": "Validate and save a support enquiry locally",
+    "image": "support",
+    "goal": "The user wants to ask how an estimate was calculated.",
+    "action": "Open Customer support, review the reply-to email, select a topic and enter a message of at least ten characters.",
+    "response": "The prototype creates a HELP reference and states that no support team was contacted. Invalid email/message input is rejected.",
+    "backend": "The form saves email, topic, message, date and status in st.session_state.support_requests. There is no email delivery or help-desk integration.",
+    "look": [
+      "Question and contact fields",
+      "Save action and local-only result"
+    ],
+    "source": "shopimpact/marketplace.py",
+    "function": "_render_help_and_returns"
+  },
+  {
+    "type": "scene",
+    "scene": "15",
+    "route": "C / DATA VALIDATION TEST",
+    "title": "Import useful rows and explain rejected ones",
+    "image": "csv_validation",
+    "goal": "The examiner wants evidence that external data is checked before entering the ledger.",
+    "action": "Upload a CSV containing a valid $32 home item, a NaN price and a future-dated row. Select Validate and import.",
+    "response": "Only the valid row is added. A warning explains skipped rows. A supplied external emissions field is not used as trusted input.",
+    "backend": "_parse_purchase_csv() checks file size, unique normalised headers, row count, non-blank product, exact category, finite non-negative price and a valid non-future ISO date.",
+    "look": [
+      "Validate-and-import control",
+      "Visible warning feedback"
+    ],
+    "source": "shopimpact/data.py",
+    "function": "_parse_purchase_csv"
+  },
+  {
+    "type": "backup",
+    "title": "Make session data portable with a validated snapshot",
+    "subtitle": "The sidebar backup is deliberate persistence; the app has no database.",
+    "image": "backup",
+    "stages": [
+      [
+        "EXPORT",
+        "JSON v2 includes ledger and wishlist, identifiers, dates, recorded CO2 and comparison baseline snapshots."
+      ],
+      [
+        "CHECK",
+        "Accept only supported schemas and bounded lists. Validate every entry and the consistency of stored reductions."
+      ],
+      [
+        "CONFIRM",
+        "The user acknowledges that restore replaces the current ledger and wishlist."
+      ],
+      [
+        "REPLACE",
+        "Only an entirely valid result is assigned to session state. Any validation issue rejects the whole restore."
+      ]
+    ],
+    "note": "Limits: 5 MB, 5,000 purchases and 500 wishlist items. Cart, profile, orders, support/return requests and display preferences are excluded. Legacy v1 CO2 is retained where present; ambiguous green_savings is discarded and recalculated as a carbon difference.",
+    "source": "shopimpact/data.py",
+    "function": "_parse_data_backup"
+  },
+  {
+    "type": "state",
+    "title": "What is stored, and where it lives",
+    "subtitle": "Everything below is session memory until the user downloads a supported backup.",
+    "entities": [
+      [
+        "PURCHASE",
+        "id · date · product · category · brand · price · co2 · baseline_co2 · carbon_saved_kg · estimate_method"
+      ],
+      [
+        "WISHLIST IDEA",
+        "id · product · category · brand · price · added_on · revisit_on · priority · note · estimated_co2"
+      ],
+      [
+        "CART + ORDERS",
+        "Cart: product_id → quantity. Order: id, date, synthetic delivery fields, item lines, subtotal, shipping, total and status index."
+      ],
+      [
+        "PROFILE + REQUESTS",
+        "Profile name/email/personalisation; return and support dictionaries. These are not part of the ledger/wishlist backup."
+      ]
+    ],
+    "note": "Streamlit session state preserves values across reruns within the session, not across every server restart or new browser session. 'Local model' means computation within the app runtime; a hosted app still sends form inputs to its Streamlit host.",
+    "source": "shopimpact/app.py"
+  },
+  {
+    "type": "accessibility",
+    "title": "Make the interface attractive without sacrificing readability",
+    "subtitle": "One active palette drives the glass, text and controls.",
+    "images": [
+      "overview_day",
+      "overview_dark",
+      "mobile"
+    ],
+    "points": [
+      [
+        "COORDINATED APPEARANCE",
+        "The palette is applied before controls render. CSS variables update text and backgrounds together; inline theme-dependent impact colors were removed."
+      ],
+      [
+        "READABLE RERUNS",
+        "Captions stay opaque and stale-content dimming is suppressed, preventing the brief low-contrast state during a theme change."
+      ],
+      [
+        "USER CONTROL",
+        "Reduce motion pauses decoration and transitions; the operating-system preference is respected. High contrast strengthens text and borders."
+      ],
+      [
+        "RESPONSIVE LAYOUT",
+        "The mobile layout stacks controls, resizes the glass scene and keeps floating card values from covering one another."
+      ]
+    ],
+    "source": "shopimpact/theme.py"
+  },
+  {
+    "type": "testing",
+    "title": "Evidence the examiner can check",
+    "subtitle": "Validation is tied to the actual source version and reproducible behaviours.",
+    "rows": [
+      [
+        "Domain checks",
+        "17 tests",
+        "Impact math, non-finite values, cost-per-use arithmetic, forecast edges, recommendation filters and privacy opt-out, legacy and v2 backups."
+      ],
+      [
+        "App interaction checks",
+        "6 tests",
+        "Every view with and without data, both themes, preserved data during switching, checkout snapshots, literal search and pause-plan saving."
+      ],
+      [
+        "Version coverage",
+        "Python 3.10 / 3.12 / 3.14",
+        "23 tests per version in the source validation workflow."
+      ],
+      [
+        "Real Chrome",
+        "Behaviour + screenshots",
+        "Repeated switches with frame-sampled contrast including ancestor opacity; dropdowns, Decision lab, mobile width/card positions and reduced motion."
+      ],
+      [
+        "Storyboard evidence",
+        "Fresh synthetic UI captures",
+        "The capture harness opens the unchanged app and operates real controls. No mocked screen images or real customer records are used."
+      ]
+    ],
+    "note": "Passing these checks supports the prototype's behaviour. It does not verify the category factors as environmental science, certify accessibility, or demonstrate a production commerce system.",
+    "source": "tests/test_domain.py"
+  },
+  {
+    "type": "limits",
+    "title": "Separate implemented behaviour from future production work",
+    "subtitle": "Clear limits make the technical explanation more credible.",
+    "rows": [
+      [
+        "Working session ledger and snapshots",
+        "Add a durable database, migrations, account ownership and recovery before long-term multi-user storage."
+      ],
+      [
+        "Local TF-IDF catalog ranking",
+        "Evaluate recommendations with a larger validated catalog and relevance feedback; do not present scores as certainty."
+      ],
+      [
+        "Directional spend-based factors",
+        "Use product-specific, independently evidenced methods and clear geographic/material assumptions for formal footprint claims."
+      ],
+      [
+        "Demo cart, orders, returns and support",
+        "Add secure commerce, inventory, carrier and support integrations only when implementing real transactions."
+      ],
+      [
+        "Theme, mobile and automated checks",
+        "Continue usability testing with real users and measure performance and accessibility across devices."
+      ]
+    ],
+    "source": "README.md"
+  },
+  {
+    "type": "closing",
+    "title": "A concise examiner walkthrough",
+    "subtitle": "Use these tasks to demonstrate the app, then explain the data behind them.",
+    "tasks": [
+      [
+        "01",
+        "Load the demo ledger",
+        "Identify the month-to-date spend, estimate, score and goal."
+      ],
+      [
+        "02",
+        "Describe a shopping intention",
+        "Explain a match, its hard filters and its ranking reasons."
+      ],
+      [
+        "03",
+        "Use Decision lab and save a pause",
+        "Trace cost per use and the wishlist revisit date."
+      ],
+      [
+        "04",
+        "Log an existing purchase",
+        "Trace baseline, recorded scenario and reduction in kilograms."
+      ],
+      [
+        "05",
+        "Review analytics and export a backup",
+        "Explain derived charts, pacing assumptions and snapshot restoration."
+      ],
+      [
+        "06",
+        "Optionally demonstrate checkout",
+        "State clearly that order, payment, tracking and support are simulated."
+      ]
+    ],
+    "source": "README.md"
+  }
+]
