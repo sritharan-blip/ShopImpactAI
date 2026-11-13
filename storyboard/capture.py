@@ -52,8 +52,18 @@ def seed(p):
     p.get_by_role("button",name="Load demo data",exact=True).click()
     p.locator(".si-hero small").filter(has_text="9 purchases").wait_for()
 def combo(p,label,option):
-    p.get_by_role("combobox",name=label,exact=True).click()
-    p.get_by_role("option",name=option,exact=True).click()
+    p.keyboard.press("Tab")
+    p.wait_for_timeout(800)
+    for attempt in range(4):
+        try:
+            p.get_by_role("combobox",name=label,exact=True).click(force=True)
+            p.get_by_role("option",name=option,exact=True).click(force=True,timeout=2500)
+            p.wait_for_timeout(500)
+            return
+        except Exception:
+            p.keyboard.press("Escape")
+            p.wait_for_timeout(600)
+    raise RuntimeError("Could not select "+label+" -> "+option)
 server=subprocess.Popen([sys.executable,"-m","streamlit","run","ShopImpactAI.py","--server.address","127.0.0.1","--server.port","8519","--server.headless","true","--server.fileWatcherType","none"],cwd=ROOT,stdout=subprocess.DEVNULL)
 try:
     for i in range(100):
