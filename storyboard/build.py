@@ -59,7 +59,7 @@ def tx(s,text,x,y,w,h,size=18,color=INK,bold=False,align=None,link=None,floor=No
         p.space_before=Pt(0);p.space_after=Pt(0);p.line_spacing=1.1
         if align is not None:p.alignment=align
         run=p.add_run();run.text=line;run.font.name="Arial";run.font.size=Pt(size);run.font.bold=bold;run.font.color.rgb=rgb(color)
-        if link:run.hyperlink.address=link
+        if link:sh.click_action.hyperlink.address=link
     bounds.append((len(prs.slides),text[:55],x,y,w,h))
     return sh
 def line(s,x1,y1,x2,y2,color=BLUE,width=1.5,arrow=False,bi=False):
@@ -104,7 +104,7 @@ def image_fit(s,name,x,y,w,h,frame=True,marks=False):
     if frame:
         box(s,x,y,w,h,WHITE,LINE,.06)
         line(s,x+.12,y+.25,x+w-.12,y+.25,LINE,.6)
-        tx(s,"REAL UI  /  SYNTHETIC DEMONSTRATION DATA",x+.2,y+.07,w-.4,.15,8.5,MUTED,True)
+        tx(s,("REAL UI / SYNTHETIC DATA" if w<4.5 else "REAL UI  /  SYNTHETIC DEMONSTRATION DATA"),x+.2,y+.07,w-.4,.15,8.5,MUTED,True)
         y+=.34;h-=.44;x+=.12;w-=.24
     scale=min(w/iw,h/ih);pw,ph=iw*scale,ih*scale;px,py=x+(w-pw)/2,y+(h-ph)/2
     pic=s.shapes.add_picture(str(path),Inches(px),Inches(py),width=Inches(pw),height=Inches(ph))
@@ -171,16 +171,16 @@ for n,page in enumerate(PAGES,1):
         tx(s,"USER GOAL  "+page["goal"],.7,1.46,14.6,.49,15.5,MUTED)
         info=image_fit(s,page["image"],.65,2.12,9.9,5.65,True,True)
         sections=[("USER ACTION","action"),("SYSTEM RESPONSE","response"),("BEHIND THE SCREEN","backend")]
-        font_size=18.0
+        font_size=17.0
         while True:
-            heights=[.68+lines_needed(page[k],4.02,font_size)*font_size*1.1/72 for _,k in sections]
+            heights=[.78+lines_needed(page[k],3.95,font_size)*font_size*1.27/72 for _,k in sections]
             if sum(heights)+.20<=5.65 or font_size<=15.5:break
             font_size-=.5
         yy=2.12
         for (label,key),hh in zip(sections,heights):
             box(s,10.85,yy,4.5,hh,WHITE,LINE,.08)
             tx(s,label,11.09,yy+.18,4.02,.25,11.5,BLUE,True)
-            tx(s,page[key],11.09,yy+.55,4.02,hh-.63,font_size,INK)
+            tx(s,page[key],11.09,yy+.55,4.02,hh-.65,font_size,INK)
             yy+=hh+.10
         marks=info["marks"][:2]
         legend="   /   ".join(str(m["n"])+" "+m["label"] for m in marks) or "Task capture: "+page["image"].replace("_"," ")

@@ -223,7 +223,7 @@
     "record": [
       [
         "id",
-        "Generated unique identifier"
+        "UUID"
       ],
       [
         "price",
